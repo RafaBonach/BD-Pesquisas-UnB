@@ -24,7 +24,6 @@ CREATE TABLE PROJETO (
   Título          VARCHAR(75)  NOT NULL,
   Data_final      DATE         NOT NULL,
   Data_inicio     DATE         NOT NULL,
-  Id_Coordenador  INT          NOT NULL,
   Resumo          text,
 
   PRIMARY KEY  (Cod_Proj, Id_Tipo_Proj),
@@ -34,7 +33,6 @@ CREATE TABLE PROJETO (
 
 CREATE TABLE INSTITUICAO (
   CNPJ                 INT          PRIMARY KEY,
-  CNAE                 VARCHAR(20)  NOT NULL,
   Nome                 VARCHAR(40)  NOT NULL,
   Sigla                VARCHAR(10),
   Natureza_Juríd       VARCHAR(20),
@@ -45,24 +43,13 @@ CREATE TABLE INSTITUICAO (
 );
 
 CREATE TABLE CONGRESSO (
-  Id_Congresso  INT PRIMARY KEY,
-  Nome          VARCHAR(45) NOT NULL,
+  Id_Congresso  INT          PRIMARY KEY,
+  Nome          VARCHAR(45)  NOT NULL,
   Descricao     text
 );
 
-CREATE TABLE EDICAO (
-  Id_Congresso  INT,
-  Cod_edicao    INT,
-  Data_inicio   DATE  NOT NULL,
-  Data_fim      DATE,
-  Descricao     text,
-
-  PRIMARY KEY (Id_Congresso, Cod_edicao),
-  FOREIGN KEY (Id_Congresso)  REFERENCES CONGRESSO(Id_Congresso)
-);
-
 CREATE TABLE LINHA_PESQUISA (
-  Id_Linha_Pesquisa  INT PRIMARY  KEY,
+  Id_Linha_Pesquisa  INT          PRIMARY  KEY,
   Nome               VARCHAR(45)  NOT NULL,
   Descrição          text
 );
@@ -75,12 +62,22 @@ CREATE TABLE AREA_ATUACAO (
 );
 
 CREATE TABLE LOCAL (
-  CEP     INT          PRIMARY KEY,
-  País    VARCHAR(45)  NOT NULL,
-  UF      CHAR(2)      NOT NULL,
-  Cidade  VARCHAR(45)  NOT NULL
+  Cod_postal  INT          PRIMARY KEY,
+  País        VARCHAR(45)  NOT NULL,
+  UF          CHAR(2)      NOT NULL,
+  Cidade      VARCHAR(45)  NOT NULL
 );
 
+CREATE TABLE PATRIMONIO (
+  Cod_Proj       INT,
+  Id_Patrimonio  INT,
+  Nome           VARCHAR(30)  NOT NULL,
+  Custo          INT          NOT NULL,
+  Especificacao  text,
+
+  PRIMARY KEY  (Id_Patrimonio, Cod_Proj),
+  FOREIGN KEY  (Cod_Proj)  REFERENCES  PROJETO(Cod_Proj)
+);
 
 
 /* Email de membro (multivalorado) */
@@ -92,30 +89,11 @@ CREATE TABLE Email (
   FOREIGN KEY (id_membro) REFERENCES MEMBRO(id_Membro)
 );
 
-/* Pesquisador orienta Estudante */
-CREATE TABLE Orienta (
-  id_Pesquisador  INT,
-  id_Estudante    INT,
-
-  PRIMARY KEY (id_Pesquisador, id_Estudante),
-  FOREIGN KEY (id_Pesquisador)  REFERENCES  MEMBRO(id_Membro),
-  FOREIGN KEY (id_Estudante)    REFERENCES  MEMBRO(id_Membro)
-);
-
-/* Pesquisador co-coordena Projeto */
-CREATE TABLE Co_coordena (
-  Id_Pesquisador  INT,
-  Cod_Proj        INT,
-
-  PRIMARY KEY  (Id_Pesquisador, Cod_Proj),
-  FOREIGN KEY  (Id_Pesquisador)  REFERENCES MEMBRO(Id_Membro),
-  FOREIGN KEY  (Cod_Proj)        REFERENCES PROJETO(Cod_Proj)
-);
-
 /* Pesquisador pesquisa Projeto */
 CREATE TABLE Pesquisa (
   Id_Pesquisador  INT,
   Cod_Proj        INT,
+  Funcao          VARCHAR(12)  NOT NULL,
 
   PRIMARY KEY  (Id_Pesquisador, Cod_Proj),
   FOREIGN KEY  (Id_Pesquisador)  REFERENCES MEMBRO(Id_Membro),
@@ -135,33 +113,33 @@ CREATE TABLE Realiza (
 
 /* Membro tem origem em Local */
 CREATE TABLE Origem (
-  CEP        INT,
-  Id_Membro  INT,
+  Cod_postal  INT,
+  Id_Membro   INT,
 
-  PRIMARY KEY  (Id_Membro, CEP),
-  FOREIGN KEY  (Id_Membro)  REFERENCES MEMBRO(Id_Membro),
-  FOREIGN KEY  (CEP)        REFERENCES LOCAL(CEP)
+  PRIMARY KEY  (Id_Membro, Cod_postal),
+  FOREIGN KEY  (Id_Membro)   REFERENCES MEMBRO(Id_Membro),
+  FOREIGN KEY  (Cod_postal)  REFERENCES LOCAL(Cod_postal)
 );
 
-/* Membro atua em Área de atuação */
-CREATE TABLE Trabalha (
-  id_Membro        INT,
+/* Pesquisador atua em Área de atuação */
+CREATE TABLE Atua (
+  Id_Pesquisador   INT,
   Id_Area_Atuacao  INT,
 
-  PRIMARY KEY  (id_Membro, Id_Area_Atuacao),
-  FOREIGN KEY  (id_Membro)        REFERENCES MEMBRO(Id_Membro),
-  FOREIGN KEY  (Id_Area_Atuacao)  REFERENCES AREA_ATUACAO(Id_Area_Atuacao)
+  PRIMARY KEY  (Id_Pesquisador, Id_Area_Atuacao),
+  FOREIGN KEY  (Id_Pesquisador)   REFERENCES  MEMBRO(Id_Membro),
+  FOREIGN KEY  (Id_Area_Atuacao)  REFERENCES  AREA_ATUACAO(Id_Area_Atuacao)
 );
 
 
 /* Projeto possui Local */
 CREATE TABLE Possui (
-  Cod_Proj  INT,
-  CEP       INT,
+  Cod_Proj    INT,
+  Cod_postal  INT,
 
-  PRIMARY KEY  (Cod_Proj, CEP),
+  PRIMARY KEY  (Cod_Proj, Cod_postal),
   FOREIGN KEY  (Cod_Proj)  REFERENCES PROJETO(Cod_Proj),
-  FOREIGN KEY  (CEP)       REFERENCES LOCAL(CEP)
+  FOREIGN KEY  (Cod_postal)       REFERENCES LOCAL(Cod_postal)
 );
 
 /* Projeto vincula Área de atuação */
@@ -175,8 +153,8 @@ CREATE TABLE Vincula (
 );
 
 
-/* Projeto atua em Linha de pesquisa */
-CREATE TABLE Atua (
+/* Projeto executa uma Linha de pesquisa */
+CREATE TABLE Executa (
   Cod_Proj           INT,
   Id_Linha_Pesquisa  INT,
 
@@ -194,6 +172,16 @@ CREATE TABLE Participa (
   PRIMARY KEY (Id_Proj, Id_Congresso),
   FOREIGN KEY (Id_Proj)       REFERENCES PROJETO(Cod_Proj),
   FOREIGN KEY (Id_Congresso)  REFERENCES CONGRESSO(Id_Congresso)
+);
+
+
+/* Instituição tem múltiplos CNAE */
+CREATE TABLE CNAE (
+  CNPJ_Instituicao  INT,
+  CNAE              VARCHAR(20),
+  
+  PRIMARY KEY  (CNPJ_Instituicao, CNAE),
+  FOREIGN KEY  (CNPJ_Instituicao)  REFERENCES  INSTITUICAO(CNPJ)
 );
 
 
@@ -216,4 +204,13 @@ CREATE TABLE Fomenta (
   PRIMARY KEY  (CNPJ, Cod_Proj),
   FOREIGN KEY  (CNPJ)      REFERENCES INSTITUICAO(CNPJ),
   FOREIGN KEY  (Cod_Proj)  REFERENCES PROJETO(Cod_Proj)
+);
+
+/* Congresso tem edição */
+CREATE TABLE Edicao (
+  Id_Congresso  INT,
+  Cod_edicao    INT,
+
+  PRIMARY KEY  (Id_Congresso, Cod_edicao),
+  FOREIGN KEY  (Id_Congresso)  REFERENCES CONGRESSO(Id_Congresso)
 );
