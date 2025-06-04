@@ -89,6 +89,26 @@ CREATE TABLE Email (
   FOREIGN KEY (id_membro) REFERENCES MEMBRO(id_Membro)
 );
 
+/* Membro tem origem em Local */
+CREATE TABLE Origem (
+  Cod_postal  INT,
+  Id_Membro   INT,
+
+  PRIMARY KEY  (Id_Membro, Cod_postal),
+  FOREIGN KEY  (Id_Membro)   REFERENCES MEMBRO(Id_Membro),
+  FOREIGN KEY  (Cod_postal)  REFERENCES LOCAL(Cod_postal)
+);
+
+/* Pesquisador atua em Área de atuação */
+CREATE TABLE Atua (
+  Id_Pesquisador   INT,
+  Id_Area_Atuacao  INT,
+
+  PRIMARY KEY  (Id_Pesquisador, Id_Area_Atuacao),
+  FOREIGN KEY  (Id_Pesquisador)   REFERENCES  MEMBRO(Id_Membro),
+  FOREIGN KEY  (Id_Area_Atuacao)  REFERENCES  AREA_ATUACAO(Id_Area_Atuacao)
+);
+
 /* Pesquisador pesquisa Projeto */
 CREATE TABLE Pesquisa (
   Id_Pesquisador  INT,
@@ -111,27 +131,6 @@ CREATE TABLE Realiza (
 );
 
 
-/* Membro tem origem em Local */
-CREATE TABLE Origem (
-  Cod_postal  INT,
-  Id_Membro   INT,
-
-  PRIMARY KEY  (Id_Membro, Cod_postal),
-  FOREIGN KEY  (Id_Membro)   REFERENCES MEMBRO(Id_Membro),
-  FOREIGN KEY  (Cod_postal)  REFERENCES LOCAL(Cod_postal)
-);
-
-/* Pesquisador atua em Área de atuação */
-CREATE TABLE Atua (
-  Id_Pesquisador   INT,
-  Id_Area_Atuacao  INT,
-
-  PRIMARY KEY  (Id_Pesquisador, Id_Area_Atuacao),
-  FOREIGN KEY  (Id_Pesquisador)   REFERENCES  MEMBRO(Id_Membro),
-  FOREIGN KEY  (Id_Area_Atuacao)  REFERENCES  AREA_ATUACAO(Id_Area_Atuacao)
-);
-
-
 /* Projeto possui Local */
 CREATE TABLE Possui (
   Cod_Proj    INT,
@@ -151,7 +150,6 @@ CREATE TABLE Vincula (
   FOREIGN KEY  (Cod_Proj)         REFERENCES PROJETO(Cod_Proj),
   FOREIGN KEY  (Id_Area_Atuacao)  REFERENCES AREA_ATUACAO(Id_Area_Atuacao)
 );
-
 
 /* Projeto executa uma Linha de pesquisa */
 CREATE TABLE Executa (
@@ -184,7 +182,6 @@ CREATE TABLE CNAE (
   FOREIGN KEY  (CNPJ_Instituicao)  REFERENCES  INSTITUICAO(CNPJ)
 );
 
-
 /* Instituição financia Projeto */
 CREATE TABLE Financia (
   Cod_Proj  INT,
@@ -205,6 +202,7 @@ CREATE TABLE Fomenta (
   FOREIGN KEY  (CNPJ)      REFERENCES INSTITUICAO(CNPJ),
   FOREIGN KEY  (Cod_Proj)  REFERENCES PROJETO(Cod_Proj)
 );
+
 
 /* Congresso tem edição */
 CREATE TABLE Edicao (
