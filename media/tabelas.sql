@@ -4,12 +4,12 @@ CREATE TABLE MEMBRO (
   Titulação        VARCHAR(15)  NOT NULL,
   Descrição        text,
 
+  /* Atributo de Pesquisador da UnB */
   Departamento     VARCHAR(30),
 
-  Matrícula        INT,
+  /* Atributos de Estudante da UnB */
+  Matrícula        INT          UNIQUE,
   Curso_estudante  VARCHAR(30),
-
-  UNIQUE (Matrícula)
 );
 
 /* Projeto tem um tipo */
@@ -19,8 +19,8 @@ CREATE TABLE TIPO_PROJETO (
 );
 
 CREATE TABLE PROJETO (
-  Cod_Proj        INT unique,
-  Id_Tipo_Proj    INT unique,
+  Cod_Proj        INT          UNIQUE,
+  Id_Tipo_Proj    INT          UNIQUE,
   Título          VARCHAR(75)  NOT NULL,
   Data_final      DATE         NOT NULL,
   Data_inicio     DATE         NOT NULL,
