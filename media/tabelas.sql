@@ -9,7 +9,7 @@ CREATE TABLE MEMBRO (
 
   /* Atributos de Estudante da UnB */
   Matrícula        INT          UNIQUE,
-  Curso_estudante  VARCHAR(30),
+  Curso_estudante  VARCHAR(30)
 );
 
 /* Projeto tem um tipo */
@@ -27,8 +27,7 @@ CREATE TABLE PROJETO (
   Resumo          text,
 
   PRIMARY KEY  (Cod_Proj, Id_Tipo_Proj),
-  FOREIGN KEY  (Id_Tipo_Proj)    REFERENCES TIPO_PROJETO(Id_Tipo_Proj),
-  FOREIGN KEY  (Id_Coordenador)  REFERENCES MEMBRO(Id_Membro)
+  FOREIGN KEY  (Id_Tipo_Proj)    REFERENCES TIPO_PROJETO(Id_Tipo_Proj)
 );
 
 CREATE TABLE INSTITUICAO (
@@ -61,7 +60,7 @@ CREATE TABLE AREA_ATUACAO (
   Descrição        text
 );
 
-CREATE TABLE LOCAL (
+CREATE TABLE LOCALIDADE (
   Cod_postal  INT          PRIMARY KEY,
   País        VARCHAR(45)  NOT NULL,
   UF          CHAR(2)      NOT NULL,
@@ -89,7 +88,7 @@ CREATE TABLE Email (
   FOREIGN KEY (id_membro) REFERENCES MEMBRO(id_Membro)
 );
 
-/* Membro tem origem em Local */
+/* Membro tem origem em Localidade */
 CREATE TABLE Origem (
   Cod_postal  INT,
   Id_Membro   INT,
@@ -131,14 +130,14 @@ CREATE TABLE Realiza (
 );
 
 
-/* Projeto possui Local */
+/* Projeto possui Localidade */
 CREATE TABLE Possui (
   Cod_Proj    INT,
   Cod_postal  INT,
 
   PRIMARY KEY  (Cod_Proj, Cod_postal),
-  FOREIGN KEY  (Cod_Proj)  REFERENCES PROJETO(Cod_Proj),
-  FOREIGN KEY  (Cod_postal)       REFERENCES LOCAL(Cod_postal)
+  FOREIGN KEY  (Cod_Proj)    REFERENCES PROJETO(Cod_Proj),
+  FOREIGN KEY  (Cod_postal)  REFERENCES LOCALIDADE(Cod_postal)
 );
 
 /* Projeto vincula Área de atuação */
