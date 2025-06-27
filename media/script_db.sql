@@ -1,3 +1,9 @@
+CREATE DATABASE banco_pesquisas;
+/* Crie um usuario no postgres com uma senha para acessar o banco de dados */
+CREATE USER postgres WITH PASSWORD 'postgres';
+/* Defina todos privilegios necessarios para o seu usuario */
+GRANT ALL PRIVILEGES ON DATABASE banco_pesquisas TO postgres;
+
 CREATE TABLE MEMBRO (
   Id_Membro        INT          PRIMARY KEY,
   Nome             VARCHAR(45)  NOT NULL,
