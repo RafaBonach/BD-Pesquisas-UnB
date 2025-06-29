@@ -1,46 +1,80 @@
 """
-    Esse arquivo conecta ao banco de dados e executa o arquivo SQL para criar as tabelas.
-    Ele utiliza SQLAlchemy para gerenciar a conexão e as transações com o banco de dados
+    Esse arquivo contém funções para conectar ao banco de dados PostgreSQL,
+    criar um banco de dados e criar tabelas a partir de um script SQL.
 """
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, declarative_base
-import os
+import pyodbc
 
-# Defina a URL postgresql com o seguinte padrão:
-# postgresql://<username>:<password>@<host>:<port>/<database>
-DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/pesquisas_unb"
-
-engine = create_engine(DATABASE_URL, echo=True)
-SessionLocal = sessionmaker(bind=engine)
-Base = declarative_base()
-
-
-def execute_sql_file():
-    sql_file_path = os.path.join(os.path.dirname(__file__), 'media', 'script_db.sql')
-
+def connect_to_database(database_name, password, user_id='postgres'):
     try:
-        with open(sql_file_path, 'r', encoding='utf-8') as file:
-            sql_script = file.read()
+        conexao = pyodbc.connect("Driver={Devart ODBC Driver for PostgreSQL};"
+                                f"Database={database_name};"
+                                "Server=localhost;"
+                                "PORT=5432;"
+                                f"User ID={user_id};"
+                                f"Password={password};"
+                                "String Types=Unicode")
+        conexao.autocommit = True
+        print(f"Conexão bem-sucedida com o banco de dados '{database_name}'!")
+        return conexao
+    except pyodbc.Error as e:
+        print(f"Erro ao conectar ao banco de dados '{database_name}':", e)
+        return None
+
+
+def create_database(password, db_name='db_pesquisas'):
+    try:
+        conexao = connect_to_database('postgres', password=password)
+        if not conexao:
+            return None
         
-        sql_commands = [cmd.strip() for cmd in sql_script.split(';') if cmd.strip()]
+        conexao.autocommit = True
+        print("Conexão com o banco de dados 'postgres' bem-sucedida!")
 
-        with engine.connect() as connection:
-            for command in sql_commands:
-                if command and not command.startswith('--'):
-                    try:
-                        connection.execute(text(command))
-                        connection.commit()
-                    except Exception as e:
-                        print(f"Error executing command: {command}\n{e}")
+        cursor_admin = conexao.cursor()
 
-    except FileNotFoundError:
-        print(f"SQL file not found: {sql_file_path}")
-    except Exception as e:
-        print(f"An error occurred while executing the SQL file: {e}")
-    
-def get_bd():
-    db = SessionLocal()
+        cursor_admin.execute(f"SELECT 1 FROM pg_database WHERE datname = '{db_name}'")
+        if not cursor_admin.fetchone():
+            cursor_admin.execute(f"CREATE DATABASE {db_name}")
+            print(f"Database '{db_name}' criada com sucesso!")
+        else:
+            print(f"Database '{db_name}' já existe.")
+
+        cursor_admin.close()
+        conexao.close()
+    except pyodbc.Error as e:
+        print("Erro ao conectar ao banco de dados:", e)
+
+def create_tables_sql_script(password ,db_name='db_pesquisas', sql_script_path='media/script_db.sql'):
     try:
-        yield db
-    finally:
-        db.close()
+        conexao = connect_to_database(db_name, password=password)
+        if not conexao:
+            return None
+        
+        cursor = conexao.cursor()
+
+        with open(sql_script_path, 'r', encoding='utf-8') as file:
+            script = file.read()
+        
+        cursor.execute(script)
+        conexao.commit()
+        print("Tabelas criadas com sucesso!")
+
+        cursor.close()
+        conexao.close()
+    except pyodbc.Error as e:
+        print("Erro ao criar tabelas:", e)
+
+if __name__ == "__main__":
+    create_database('rafael266224')
+    create_tables_sql_script('rafael266224', 'db_pesquisas', 'media/script_db.sql')
+
+    conexao = connect_to_database('teste', 'rafael266224')
+    if conexao:
+        conexao.close()
+        print("Conexão fechada com sucesso.")
+
+    cursor = conexao.cursor()
+
+    cursor.execute("SELECT * FROM vendas")
+    for row in cursor.fetchall():
+        print(row)
