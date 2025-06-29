@@ -63,18 +63,3 @@ def create_tables_sql_script(password ,db_name='db_pesquisas', sql_script_path='
         conexao.close()
     except pyodbc.Error as e:
         print("Erro ao criar tabelas:", e)
-
-if __name__ == "__main__":
-    create_database('rafael266224')
-    create_tables_sql_script('rafael266224', 'db_pesquisas', 'media/script_db.sql')
-
-    conexao = connect_to_database('teste', 'rafael266224')
-    if conexao:
-        conexao.close()
-        print("Conexão fechada com sucesso.")
-
-    cursor = conexao.cursor()
-
-    cursor.execute("SELECT * FROM vendas")
-    for row in cursor.fetchall():
-        print(row)

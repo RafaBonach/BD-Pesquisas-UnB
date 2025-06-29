@@ -1,9 +1,3 @@
-CREATE DATABASE banco_pesquisas;
-/* Crie um usuario no postgres com uma senha para acessar o banco de dados */
-CREATE USER postgres WITH PASSWORD 'postgres';
-/* Defina todos privilegios necessarios para o seu usuario */
-GRANT ALL PRIVILEGES ON DATABASE banco_pesquisas TO postgres;
-
 CREATE TABLE MEMBRO (
   Id_Membro        INT          PRIMARY KEY,
   Nome             VARCHAR(45)  NOT NULL,
@@ -101,7 +95,7 @@ CREATE TABLE Origem (
 
   PRIMARY KEY  (Id_Membro, Cod_postal),
   FOREIGN KEY  (Id_Membro)   REFERENCES MEMBRO(Id_Membro),
-  FOREIGN KEY  (Cod_postal)  REFERENCES LOCAL(Cod_postal)
+  FOREIGN KEY  (Cod_postal)  REFERENCES LOCALIDADE(Cod_postal)
 );
 
 /* Pesquisador atua em Área de atuação */
