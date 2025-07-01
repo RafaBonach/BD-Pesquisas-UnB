@@ -21,14 +21,13 @@ def connect_to_database(database_name, password, user_id='postgres'):
         return None
 
 
-def create_database(password, db_name='db_pesquisas'):
+def create_database(password, database_name='postgres', db_name='db_pesquisas'):
     try:
-        conexao = connect_to_database('postgres', password=password)
+        conexao = connect_to_database(database_name=database_name, password=password)
         if not conexao:
             return None
         
         conexao.autocommit = True
-        print("Conexão com o banco de dados 'postgres' bem-sucedida!")
 
         cursor_admin = conexao.cursor()
 
@@ -39,10 +38,11 @@ def create_database(password, db_name='db_pesquisas'):
         else:
             print(f"Database '{db_name}' já existe.")
 
-        cursor_admin.close()
-        conexao.close()
+        return conexao
     except pyodbc.Error as e:
         print("Erro ao conectar ao banco de dados:", e)
+        conexao.close()
+        return None
 
 def create_tables_sql_script(password ,db_name='db_pesquisas', sql_script_path='media/script_db.sql'):
     try:
