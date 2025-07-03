@@ -263,3 +263,37 @@ order by Nome;"""
         except pyodbc.Error as e:
             print(f"Erro ao executar a consulta: {e}")
             return None
+
+
+def insert_account(cursor, acc_type, acc_name, acc_password):
+    try:
+        cursor.execute(f"""INSERT INTO Conta (Tipo, Nome, Senha) VALUES ({acc_type}, {acc_name}, {acc_password})""")
+
+        return True
+
+    except pyodbc.Error as e:
+        print(f"Erro na criação de conta!\n{e}")
+        return -1
+
+def account_in_db(cursor, acc_name, acc_password):
+    try:
+        acc_exists = len(cursor.execute(f"SELECT * FROM Conta WHERE Nome='{acc_name}' AND Senha='{acc_password}'").fetchall()) != 0
+
+        return acc_exists
+
+    except pyodbc.Error as e:
+        print(f"Erro na consulta de conta!\n{e}")
+        return -1
+
+def get_acc(cursor, acc_name, acc_password):
+    try:
+        acc_list = cursor.execute(f"SELECT Id_Conta Tipo FROM Conta WHERE Nome='{acc_name}' AND Senha='{acc_password}'").fetchall()
+
+        if len(acc_list) == 0:
+            return None
+
+        return acc_list[0]
+
+    except pyodbc.Error as e:
+        print(f"Erro na consulta de conta!\n{e}")
+        return None

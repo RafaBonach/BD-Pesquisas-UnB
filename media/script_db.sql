@@ -211,3 +211,16 @@ CREATE TABLE Edicao (
   PRIMARY KEY  (Id_Congresso, Cod_edicao),
   FOREIGN KEY  (Id_Congresso)  REFERENCES CONGRESSO(Id_Congresso)
 );
+
+
+/* Contas de usuário do sistema */
+/* Tipo: 0, 1, 2, 3 -> instituiçao, pesquisador, estudante, colaborador externo */
+CREATE TABLE Conta (
+  Id_Conta  SERIAL        PRIMARY KEY,
+  Tipo      INT,
+  Nome      VARCHAR(15),
+  Senha     CHAR(8),
+
+  UNIQUE (Nome, Senha),
+  NOT NULL (Tipo, Nome, Senha)
+);

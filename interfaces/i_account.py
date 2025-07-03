@@ -1,20 +1,15 @@
 from utils import *
+from models_db import insert_account, account_in_db, get_acc
 
 class IAccount:
     def __init__(self):
         self.acc_options = ["Voltar", "Criar conta", "Entrar em conta"]
+        self.user = None
     
 
-    def validate(self, acc_type, username, password):
+    def validate(self, username, password):
         """acc_type: tipo de conta (0 instituição, 1 pesquisador, 2 estudante, 3 colaborador externo)"""
-        # checar se nome de usuário e senha constam nos registros
-        return True
-
-
-    def create_account(self, acc_type:int, username, passord):
-        """acc_type: tipo de conta (0 instituição, 1 pesquisador, 2 estudante, 3 colaborador externo)"""
-        # criar conta no BD?
-        return True
+        return account_in_db(username, password)
 
 
     def register_menu(self, acc_type:int):
@@ -23,14 +18,24 @@ class IAccount:
         print("==================\n"
               "     Registro     \n"
               "==================\n\n"
-              "Insira o nome de usuário: ")
-        username = input()
-        print("Insira a senha: ")
-        password = input()
+              "Insira o nome de usuário (até 15 caracteres):")
 
-        success = self.create_account(acc_type, username, password)
+        username = input()
+        if len(username) == 0 or len(username) > 15:
+            input("Nome inválido")
+            return
+
+        print("Insira a senha (exatamente 8 caracteres):")
+
+        password = input()
+        if len(password) != 8 or " " in password:
+            input("Senha inválida")
+            return
+
+        success = insert_account(acc_type, username, password)
         if not success:
-            input("Falha na criação da conta.")
+            input("\nFalha na criação da conta!")
+            return
 
         input("\nConta criada com sucesso!")
 
@@ -41,101 +46,127 @@ class IAccount:
         print("==================\n"
                 "       Login      \n"
                 "==================\n\n"
-                "Nome de usuário: ")
+                "Nome de usuário:")
         username = input()
-        print("Senha: ")
+        print("Senha:")
         password = input()
 
-        if not self.validate(acc_type, username, password):
-            print("Não foi possível fazer login. Tente novamente.")
 
-        # logar
+        acc_info = get_acc(username, password)
+        account = {
+            "acc_id" : acc_info[0],
+            "acc_type" : acc_info[1]
+        }
+
+        if not account:
+            input("Não foi possível fazer login. Tente novamente.")
+            return
+
+        self.go_to_menu(account)
+
+    def go_to_menu(self, account):
+        # prosseguir pra tela de perfil do usuário
+        """
+        match (acccount["acc_type"]):
+            case 0:
+                #login instit.
+            case 1:
+                #pesquisador
+            case 2:
+                #estudante
+            case 3:
+                #col. externo
+            case _:
+                input("Falha ao acessar página de usuário")
+                return"""
+        return
 
 
-    def institution_menu(self):
+
+    def institution_menu(self, cursor):
         while True:
             clear()
             print("==========================\n"
                   "   Conta - Instituição    \n"
                   "==========================\n\n"
-                  "Escolha uma opção: ")
+                  "Escolha uma opção:")
             print_menu(self.acc_options)
             choice = input_choice(len(self.acc_options))
 
             match(choice):
-                case -1:
-                    input("Opção inválida.")
                 case 0:
                     return
                 case 1:
-                    self.register_menu(0)
+                    self.register_menu(cursor, 0)
                 case 2:
-                    self.login_menu(0)
+                    self.login_menu(cursor, 0)
+                case _:
+                    input("Opção inválida.")
 
 
-    def researcher_menu(self):
+    def researcher_menu(self, cursor):
         while True:
             clear()
             print("==========================\n"
                   "   Conta - Pesquisador    \n"
                   "==========================\n\n"
-                  "Escolha uma opção: ")
+                  "Escolha uma opção:")
             print_menu(self.acc_options)
             choice = input_choice(len(self.acc_options))
 
             match(choice):
-                case -1:
-                    input("Opção inválida.")
                 case 0:
                     return
                 case 1:
-                    self.register_menu(1)
+                    self.register_menu(cursor, 1)
                 case 2:
-                    self.login_menu(1)
+                    self.login_menu(cursor, 1)
+                case _:
+                    input("Opção inválida.")
 
-    def student_menu(self):
+    def student_menu(self, cursor):
         while True:
             clear()
             print("==========================\n"
                   "    Conta - Estudante     \n"
                   "==========================\n\n"
-                  "Escolha uma opção: ")
+                  "Escolha uma opção:")
             print_menu(self.acc_options)
             choice = input_choice(len(self.acc_options))
 
             match(choice):
-                case -1:
-                    input("Opção inválida.")
                 case 0:
                     return
                 case 1:
-                    self.register_menu(2)
+                    self.register_menu(cursor, 2)
                 case 2:
-                    self.login_menu(2)
+                    self.login_menu(cursor, 2)
+                case _:
+                    input("Opção inválida.")
 
 
-    def extern_menu(self):
+    def extern_menu(self, cursor):
         while True:
             clear()
             print("==========================\n"
                   " Conta - Colaborador Ext.  \n"
                   "==========================\n\n"
-                  "Escolha uma opção: ")
+                  "Escolha uma opção:")
             print_menu(self.acc_options)
             choice = input_choice(len(self.acc_options))
 
             match(choice):
-                case -1:
-                    input("Opção inválida.")
                 case 0:
                     return
                 case 1:
-                    self.register_menu(3)
+                    self.register_menu(cursor, 3)
                 case 2:
-                    self.login_menu(3)
+                    self.login_menu(cursor, 3)
+                case _:
+                    input("Opção inválida.")
 
 
-    def run(self):
+    def run(self, cursor):
         options = ["Voltar", "Instituição", "Pesquisador", "Estudante", "Colaborador Externo"]
 
         while True:
@@ -156,13 +187,13 @@ class IAccount:
             
             match(choice):
                 case 1:
-                    self.institution_menu()
+                    self.institution_menu(cursor)
 
                 case 2:
-                    self.researcher_menu()
+                    self.researcher_menu(cursor)
 
                 case 3:
-                    self.student_menu()
+                    self.student_menu(cursor)
 
                 case 4:
-                    self.extern_menu()
+                    self.extern_menu(cursor)
