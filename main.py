@@ -1,13 +1,30 @@
 '''
     Esse será o arquivo principal do projeto.
 '''
-from backend_db import connect_to_database
 from utils import *
+from backend_db import *
 from interfaces.i_account import IAccount
+from interfaces.i_search import ISearch
+import time
 
 # Executa o arquivo SQL para criar as tabelas no banco de dados
 if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o código abaixo
-    options = ["Sair", "Gerenciar conta"]
+    print("==========================\n"
+            " Gerenciador de Projetos  \n"
+            "    de Pesquisa da UnB    \n"
+            "==========================\n\n"
+            "Bem-vindo ao sistema de gerenciamento de projetos de pesquisa da UnB!\n"
+            "Para começar, precisamos garantir que o banco de dados esteja configurado.\n"
+            "Por favor, insira a senha do banco de dados PostgreSQL:\n")
+    password = input("Senha: ")
+
+    create_database(password=password, db_name='db_pesquisas')
+    create_tables_sql_script(password=password, db_name='db_pesquisas', sql_script_path='media/script_db.sql')
+    conexao = connect_to_database(database_name='db_pesquisas', password=password)
+    
+    time.sleep(2)
+    
+    options = ["Sair", "Gerenciar conta", "Pesquisar projetos e pesquisadores"]
 
     while True:
         clear()
@@ -29,8 +46,11 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
             clear()
             exit()
 
-        elif choice == 1:
-            i_acc = IAccount()
-            i_acc.run()
-
-
+        match(choice):
+            case 1:
+                i_acc = IAccount()
+                i_acc.run()
+            
+            case 2:
+                i_search = ISearch(conexao.cursor())
+                i_search.menu()

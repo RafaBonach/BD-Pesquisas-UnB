@@ -38,11 +38,11 @@ def create_database(password, database_name='postgres', db_name='db_pesquisas'):
         else:
             print(f"Database '{db_name}' já existe.")
 
-        return conexao
     except pyodbc.Error as e:
         print("Erro ao conectar ao banco de dados:", e)
-        conexao.close()
-        return None
+    finally:
+        if conexao:
+            conexao.close()
 
 def create_tables_sql_script(password ,db_name='db_pesquisas', sql_script_path='media/script_db.sql'):
     try:
@@ -58,8 +58,14 @@ def create_tables_sql_script(password ,db_name='db_pesquisas', sql_script_path='
         cursor.execute(script)
         conexao.commit()
         print("Tabelas criadas com sucesso!")
-
-        cursor.close()
-        conexao.close()
     except pyodbc.Error as e:
         print("Erro ao criar tabelas:", e)
+    finally:
+        if conexao:
+            conexao.close()
+
+if __name__ == "__main__":
+    # Exemplo de uso
+    password = input("Digite a senha do banco de dados: ")
+    create_database(password)
+    create_tables_sql_script(password)
