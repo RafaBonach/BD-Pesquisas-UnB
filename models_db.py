@@ -3,9 +3,7 @@
     Esses modelos serão usados para fazer o CRUD dos dados das tabelas e demais funções relacionadas.
 """
 import pyodbc
-from backend_db import create_database
-from utils import *
-from interfaces.i_account import IAccount
+
 
 class Pesquisa_projeto:
     def __init__(self, projeto="", nome_instituicao="", nome_membro="", tipo_projeto="", linha_pesquisa="", area_atuacao=""):
