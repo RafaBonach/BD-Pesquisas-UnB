@@ -289,8 +289,6 @@ def get_acc(cursor, acc_name, acc_password):
         if len(acc_record) == 0:
             return None
 
-        print(acc_record)
-
         return acc_record[0]
 
     except pyodbc.Error as e:
