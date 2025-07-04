@@ -83,7 +83,7 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
 
         match(choice):
             case 1:
-                i_acc = IAccount()
+                i_acc = IAccount(conexao.cursor())
                 i_acc.run()
             
             case 2:
