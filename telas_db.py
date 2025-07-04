@@ -87,3 +87,35 @@ def inserir_pesquisador(conexao, id_membro, nome, titulacao, descricao, departam
         print("Pesquisador inserido com sucesso!")
     except pyodbc.Error as e:
         print("Erro ao inserir pesquisador:", e)
+
+def atualizar_membro(conexao, id_membro, nome=None, titulacao=None, descricao=None, departamento=None, matricula=None, curso_estudante=None):
+    try:
+        cursor = conexao.cursor()
+        campos = []
+        valores = []
+        if nome: campos.append("Nome = ?"); valores.append(nome)
+        if titulacao: campos.append("Titulação = ?"); valores.append(titulacao)
+        if descricao: campos.append("Descrição = ?"); valores.append(descricao)
+        if departamento: campos.append("Departamento = ?"); valores.append(departamento)
+        if matricula: campos.append("Matrícula = ?"); valores.append(matricula)
+        if curso_estudante: campos.append("Curso_estudante = ?"); valores.append(curso_estudante)
+        if len(campos) == 0:
+            print("Nenhuma campo para atualizar.")
+            return
+        query = f"UPDATE MEMBRO SET {', '.join(campos)} WHERE Id_membro = ?"
+        valores.append(id_membro)
+        cursor.execute(query, valores)
+        conexao.commit()
+        print("Membro atualizado com sucesso!")
+    except pyodbc.Error as e:
+        print("Erro ao atualizar membro!", e)
+
+def deletar_membro(conexao, id_membro):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("DELETE FROM MEMBRO WHERE Id_Membro = ?", (id_membro,))
+        conexao.commit()
+        print("Membro deletado com sucesso!")
+    except pyodbc.Error as e:
+        print("Erro ao deletar membro:", e)
+        
