@@ -52,6 +52,7 @@ def deletar_instituicao(conexao, cnpj):
 
 
 ### TELA MEMBRO
+# Inserção do membro externo
 def inserir_membro_externo(conexao, id_membro, nome, titulacao, descricao=None):
     try:
         cursor = conexao.cursor()
@@ -64,6 +65,7 @@ def inserir_membro_externo(conexao, id_membro, nome, titulacao, descricao=None):
     except pyodbc.Error as  e:
         print("Erro ao inserir membro externo:", e)
 
+# Inserção do estudante
 def inserir_estudante(conexao, id_membro, nome, titulacao, descricao, matricula, curso_estudante):
     try:
         cursor = conexao.cursor()
@@ -118,4 +120,81 @@ def deletar_membro(conexao, id_membro):
         print("Membro deletado com sucesso!")
     except pyodbc.Error as e:
         print("Erro ao deletar membro:", e)
-        
+
+### PARA ATRIBUTOS MULTIVALORADOS
+## CRUD PARA EMAIL(MEMBRO)
+def inserir_email(conexao, email, id_membro):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+            INSERT INTO Email (Email, id_membro)
+            VALUES (?, ?)
+        """, (email, id_membro))
+        conexao.commit()
+        print("Email inserido com sucesso!")
+    except pyodbc.Error as e:
+        print("Erro ao inserir email:", e)
+
+def atualizar_email(conexao, email_antigo, id_membro, email_novo):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+            UPDATE Email
+            SET Email = ?
+            WHERE Email = ? AND id_membro = ?
+        """, (email_novo, email_antigo, id_membro))
+        conexao.commit()
+        print("Email atualizado com sucesso!")
+    except pyodbc.Error as e:
+        print("Erro ao atualizar email:", e)
+
+def deletar_email(conexao, email, id_membro):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+            DELETE FROM Email
+            WHERE Email = ? AND id_membro = ?
+        """, (email, id_membro))
+        conexao.commit()
+        print("Email deletado com sucesso!")
+    except pyodbc.Error as e:
+        print("Erro ao deletar email:", e)
+
+## CRUD PARA CNAE(INSTITUIÇÃO)
+
+def inserir_cnae(conexao, cnpj_instituicao, cnae):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+            INSERT INTO CNAE (CNPJ_Instituicao, CNAE
+            VALUES (?, ?)
+        """, (cnpj_instituicao, cnae))
+        conexao.commit()
+        print("CNAE inserido com sucesso!")
+    except pyodbc.Error as e:
+        print("Erro ao inserir CNAE:", e)
+
+def atualizar_cnae(conexao, cnpj_instituicao, cnae_antigo, cnae_novo):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+            UPDATE CNAE
+            SET CNAE = ?
+            WHERE CNPJ_Instituicao= ? AND CNAE = ?
+        """, (cnae_novo, cnpj_instituicao, cnae_antigo))
+        conexao.commit()
+        print("CNAE atualizado com sucesso!")
+    except pyodbc.Error as e:
+        print("Erro ao atualizar CNAE:", e)
+
+def deletar_cnae(conexao, cnpj_instituicao, cnae):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+            DELETE FROM CNAE
+            WHERE CNPJ_Instituicao = ? AND CNAE = ?
+        """, (cnpj_instituicao, cnae))
+        conexao.commit()
+        print("CNAE deletado com sucesso!")
+    except pyodbc.Error as e:
+        print("Erro ao deletar CNAE:", e)
