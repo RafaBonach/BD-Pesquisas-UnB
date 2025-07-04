@@ -265,8 +265,7 @@ order by Nome;"""
 
 def insert_account(cursor, acc_type, acc_name, acc_password):
     try:
-        cursor.execute(f"""INSERT INTO Conta (Tipo, Nome, Senha) VALUES ({acc_type}, {acc_name}, {acc_password})""")
-
+        cursor.execute(f"INSERT INTO Conta (Id_Conta, Tipo, Nome, Senha) VALUES (DEFAULT, {acc_type}, '{acc_name}', '{acc_password}')")
         return True
 
     except pyodbc.Error as e:
@@ -285,13 +284,22 @@ def account_in_db(cursor, acc_name, acc_password):
 
 def get_acc(cursor, acc_name, acc_password):
     try:
-        acc_list = cursor.execute(f"SELECT Id_Conta Tipo FROM Conta WHERE Nome='{acc_name}' AND Senha='{acc_password}'").fetchall()
+        acc_record = cursor.execute(f"SELECT Id_Conta, Tipo FROM Conta WHERE Nome='{acc_name}' AND Senha='{acc_password}'").fetchall()
 
-        if len(acc_list) == 0:
+        if len(acc_record) == 0:
             return None
 
-        return acc_list[0]
+        print(acc_record)
+
+        return acc_record[0]
 
     except pyodbc.Error as e:
         print(f"Erro na consulta de conta!\n{e}")
         return None
+
+def delete_acc_records(cursor):
+    try:
+        cursor.execute("DELETE FROM Conta")
+
+    except pyodbc.Error as e:
+        print(f"Erro na deleção de contas!\n{e}")

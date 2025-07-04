@@ -2,13 +2,13 @@ from utils import *
 from models_db import insert_account, account_in_db, get_acc
 
 class IAccount:
-    def __init__(self):
+    def __init__(self, cursor):
+        self.cursor = cursor
         self.acc_options = ["Voltar", "Criar conta", "Entrar em conta"]
-        self.user = None
+        self.account = None
     
 
     def validate(self, username, password):
-        """acc_type: tipo de conta (0 instituição, 1 pesquisador, 2 estudante, 3 colaborador externo)"""
         return account_in_db(username, password)
 
 
@@ -32,7 +32,7 @@ class IAccount:
             input("Senha inválida")
             return
 
-        success = insert_account(acc_type, username, password)
+        success = insert_account(self.cursor, acc_type, username, password)
         if not success:
             input("\nFalha na criação da conta!")
             return
@@ -40,8 +40,7 @@ class IAccount:
         input("\nConta criada com sucesso!")
 
 
-    def login_menu(self, acc_type):
-        """acc_type: tipo de conta (0 instituição, 1 pesquisador, 2 estudante, 3 colaborador externo)"""
+    def login_menu(self):
         clear()
         print("==================\n"
                 "       Login      \n"
@@ -52,19 +51,22 @@ class IAccount:
         password = input()
 
 
-        acc_info = get_acc(username, password)
-        account = {
+        acc_info = get_acc(self.cursor, username, password)
+
+        if not acc_info:
+            input("Não foi possível fazer login. Tente novamente.")
+            return
+
+        self.account = {
             "acc_id" : acc_info[0],
             "acc_type" : acc_info[1]
         }
 
-        if not account:
-            input("Não foi possível fazer login. Tente novamente.")
-            return
-
-        self.go_to_menu(account)
+        input("Login efetuado com sucesso!")
+        self.go_to_menu(self.account)
 
     def go_to_menu(self, account):
+        """account: dicionário de conta, com id e tipo de conta"""
         # prosseguir pra tela de perfil do usuário
         """
         match (acccount["acc_type"]):
@@ -83,7 +85,7 @@ class IAccount:
 
 
 
-    def institution_menu(self, cursor):
+    def institution_menu(self):
         while True:
             clear()
             print("==========================\n"
@@ -97,14 +99,14 @@ class IAccount:
                 case 0:
                     return
                 case 1:
-                    self.register_menu(cursor, 0)
+                    self.register_menu(0)
                 case 2:
-                    self.login_menu(cursor, 0)
+                    self.login_menu()
                 case _:
                     input("Opção inválida.")
 
 
-    def researcher_menu(self, cursor):
+    def researcher_menu(self):
         while True:
             clear()
             print("==========================\n"
@@ -118,13 +120,13 @@ class IAccount:
                 case 0:
                     return
                 case 1:
-                    self.register_menu(cursor, 1)
+                    self.register_menu(1)
                 case 2:
-                    self.login_menu(cursor, 1)
+                    self.login_menu()
                 case _:
                     input("Opção inválida.")
 
-    def student_menu(self, cursor):
+    def student_menu(self):
         while True:
             clear()
             print("==========================\n"
@@ -138,14 +140,14 @@ class IAccount:
                 case 0:
                     return
                 case 1:
-                    self.register_menu(cursor, 2)
+                    self.register_menu(2)
                 case 2:
-                    self.login_menu(cursor, 2)
+                    self.login_menu()
                 case _:
                     input("Opção inválida.")
 
 
-    def extern_menu(self, cursor):
+    def extern_menu(self):
         while True:
             clear()
             print("==========================\n"
@@ -159,14 +161,14 @@ class IAccount:
                 case 0:
                     return
                 case 1:
-                    self.register_menu(cursor, 3)
+                    self.register_menu(3)
                 case 2:
-                    self.login_menu(cursor, 3)
+                    self.login_menu()
                 case _:
                     input("Opção inválida.")
 
 
-    def run(self, cursor):
+    def run(self):
         options = ["Voltar", "Instituição", "Pesquisador", "Estudante", "Colaborador Externo"]
 
         while True:
@@ -187,13 +189,13 @@ class IAccount:
             
             match(choice):
                 case 1:
-                    self.institution_menu(cursor)
+                    self.institution_menu()
 
                 case 2:
-                    self.researcher_menu(cursor)
+                    self.researcher_menu()
 
                 case 3:
-                    self.student_menu(cursor)
+                    self.student_menu()
 
                 case 4:
-                    self.extern_menu(cursor)
+                    self.extern_menu()

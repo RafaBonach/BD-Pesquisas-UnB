@@ -22,7 +22,7 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
     create_tables_sql_script(password=password, db_name='db_pesquisas', sql_script_path='media/script_db.sql')
     conexao = connect_to_database(database_name='db_pesquisas', password=password)
     
-    time.sleep(2)
+    input()
     
     options = ["Sair", "Gerenciar conta", "Pesquisar projetos e pesquisadores"]
 
@@ -48,7 +48,7 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
 
         match(choice):
             case 1:
-                i_acc = IAccount()
+                i_acc = IAccount(conexao.cursor())
                 i_acc.run()
             
             case 2:
