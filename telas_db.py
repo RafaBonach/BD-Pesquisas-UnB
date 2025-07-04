@@ -1,7 +1,8 @@
 import  pyodbc
 from backend_db import connect_to_database # Para usar a função de conexão
 
-# Tela Instituição
+### TELA INSTITUIÇÃO ###
+
 ## Inserção ##
 def inserir_instituicao(conexao, cnpj, nome, sigla, natureza_jurid, uf, localidade, recursos_investidos, descricao):
     try:
@@ -48,3 +49,41 @@ def deletar_instituicao(conexao, cnpj):
         print("Instituição deletada com sucesso!")
     except pyodbc.Error as  e:
         print("Erro ao deletar instituição:", e)
+
+
+### TELA MEMBRO
+def inserir_membro_externo(conexao, id_membro, nome, titulacao, descricao=None):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+            INSERT INTO MEMBRO (id_Membro, Nome, Titulação,  Descrição)
+            VALUES (?, ?, ?, ?)
+        """, (id_membro, nome, titulacao, descricao))
+        conexao.commit()
+        print("Membro externo inserido com sucesso!")
+    except pyodbc.Error as  e:
+        print("Erro ao inserir membro externo:", e)
+
+def inserir_estudante(conexao, id_membro, nome, titulacao, descricao, matricula, curso_estudante):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+            INSERT INTO MEMBRO (Id_Membro, Nome, Titulação, Descrição, Matrícula, Curso_estudante)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (id_membro, nome, titulacao, descricao, matricula, curso_estudante))
+        conexao.commit()
+        print("Estudante inserido com sucesso!")
+    except pyodbc.Error as e:
+        print("Erro ao inserir estudante:", e)
+
+def inserir_pesquisador(conexao, id_membro, nome, titulacao, descricao, departamento):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+            INSERT INTO MEMBRO (Id_Membro, Nome, Titulação, Descrição, Departamento)
+            VALUES (?, ?, ?, ?, ?)
+        """, (id_membro, nome, titulacao, descricao, departamento))
+        conexao.commit()
+        print("Pesquisador inserido com sucesso!")
+    except pyodbc.Error as e:
+        print("Erro ao inserir pesquisador:", e)
