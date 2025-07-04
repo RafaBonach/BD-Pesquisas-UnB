@@ -3,11 +3,11 @@ from models_db import *
 import time
 
 class ISearch:
-    def __init__(self, cursor, conta=""):
+    def __init__(self, cursor, tipo_conta=""):
         self.cursor = cursor
-        self.conta = conta
+        self.tipo_conta = tipo_conta
 
-    def search_project(self):
+    def search_projects(self):
         clear()
         print("==========================\n"
               "   Pesquisa por Projeto   \n"
@@ -19,47 +19,47 @@ class ISearch:
         linha_pesquisa = input("Linha de pesquisa: ").strip() or ""
         area_atuação = input("Área de atuação: ").strip() or ""
         nome_membro = input("Nome do membro: ").strip() or ""
-        nome_instituicao = input("Nome da instituição: ").strip() or ""
+        nome_instituicao = input("Nome da instituição fomentadora: ").strip() or ""
         time.sleep(2)
 
         projeto = Pesquisa_projeto(
             projeto=nome_projeto,
             tipo_projeto=tipo_projeto,
-            linha_pesquisa=linha_pesquisa,
-            area_atuacao=area_atuação,
             nome_membro=nome_membro,
-            nome_instituicao=nome_instituicao
+            nome_instituicao=nome_instituicao,
+            linha_pesquisa = linha_pesquisa,
+            area_atuacao = area_atuação
         )
         
         resultado = projeto.resultado_pesquisa(self.cursor)
 
         clear()
-        if resultado != None:
-            print("\n\nProjetos encontrados:")
+        if resultado != [[]]:
+            print("Projetos encontrados:\n")
             print("\n==========================\n\n")
-            for titulo, nome_tipo, resumo, l_pesquisa, escricao_linha_pesquisa, nome_area_atuacao, data_inicio, data_final, nome_congresso, funcao_membro, n_instituicao, tipo_fomento in resultado:
+            for p in resultado:
                 
-                print(f"""
-Nome:                           {titulo}\n
-Tipo de projeto:                {nome_tipo}\n
-Resumo:                         {resumo}\n
-Linha de pesquisa:              {l_pesquisa}\n
-Descrição da linha de pesquisa: {escricao_linha_pesquisa}\n
-Área de atuação:                {nome_area_atuacao}\n
-Data de início:                 {data_inicio}\n
-Data de término:                {data_final}\n
-Congresso participado:          {nome_congresso}\n
-Membro envolvido:               {nome_membro}\n
-Funcao do membro:               {funcao_membro}\n
-Nome da instituição fomentadora:{n_instituicao}\n
-Tipo de fomento:                {tipo_fomento}\n
-""")
+                print(
+                f"Nome:                         {p[0]}\n"
+                f"Resumo:                       {p[1]}\n"
+                f"Data de início:               {p[2]}\n"
+                f"Data de término:              {p[3]}\n"
+                f"Tipo de projeto:              {p[4]}\n"
+                f"Membros envolvidos:"
+                f"      {p[5]}\n"
+                f"Instituição fomentadora:      {p[6]}\n"
+                f"Linha de pesquisa:            {p[7]}\n"
+                f"Área de atuação:              {p[8]}\n"
+                f"Congressos que participou:    {p[9]}\n"
+                )
                 print("\n\n==========================\n")
                 time.sleep(1)
+
             print("\n\nTotal de projetos encontrados: ", len(resultado))
-        
         else:
-            input("Erro no acesso ao banco de dados.")
+            print("==========================\n"
+                "Nenhum projeto encontrado com os critérios informados."
+                "\n==========================")
 
         print("\n\nDeseja pesquisar novamente? (S/N)")
         choice = input().strip().upper()
@@ -67,8 +67,8 @@ Tipo de fomento:                {tipo_fomento}\n
             self.search_project()
         else:
             return
-        
-    def search_pesquisador(self):
+
+    def search_pesquisador(self, id=None):
         clear()
         print("==========================\n"
               " Pesquisa por Pesquisador  \n"
@@ -81,61 +81,71 @@ Tipo de fomento:                {tipo_fomento}\n
         time.sleep(2)
 
         pesquisador = Pesquisa_pesquisador(
+            id=id,
             nome_membro=nome_pesquisador,
             nome_instituicao=instituicao,
             area_atuacao=area_atuacao
         )
         
-        if self.conta == "Instituição":
+        if self.tipo_conta == "pesquisador" and pesquisador.id is not None:
             resultado = pesquisador.info_pesquisador_detalhado(self.cursor)
 
             clear()
-            if resultado != None:
+            if resultado != [[]]:
                 print("\n\nPesquisadores encontrados:")
                 print("\n==========================\n\n")
                 for p in resultado:
-                    print(f"""
-Nome:               {p.Nome_membro}\n
-Titulação:          {p.titulacao}\n
-Descrição:          {p.descricao_membro}\n
-Departamento:       {p.Departamento}\n
-Área de atuação:    {p.Nome_area_atuacao}\n
-Email:              {p.Email}\n
-País:               {p.pais}\n
-UF:                 {p.UF}\n
-Projeto:            {p.titulo_projeto}\n
-Resumo do projeto:  {p.resumo_projeto}\n
-""")
+                    print(
+                        f"ID:                                   {p[0]}\n"
+                        f"Nome:                                 {p[1]}\n"
+                        f"Titulação:                            {p[2]}\n"
+                        f"Departamento:                         {p[3]}\n"
+                        f"Descrição:                            {p[4]}\n"
+                        f"Área de atuação:                      {p[5]}\n"
+                        f"Email:                                {p[6]}\n"
+                        f"País:                                 {p[7]}\n"
+                        f"UF:                                   {p[8]}\n"
+                        f"Cidade:                               {p[9]}\n"
+                        f"""Areas de Atuação:
+                                {p[10]}\n"""
+                        f"""Projetos que participa:
+                                {p[11]}\n"""
+                        f"Quantidade de congressos que participou: {p[12]}\n"
+                        f"""Congressos que participou:
+                                {p[13]}\n""")
 
                     print("\n\n==========================\n")
                     time.sleep(1)
                 print("\n\nTotal de pesquisadores encontrados: ", len(resultado))
             else:
-                input("Erro no acesso ao banco de dados.")
+                print("==========================\n"
+                "Nenhum Pesquisador encontrado com os critérios informados."
+                "\n==========================")
         else:
             resultado = pesquisador.info_pesquisador(self.cursor)
 
             clear()
-            if resultado != None:
+            if resultado != [[]]:
                 print("\n\nPesquisadores encontrados:")
                 print("\n==========================\n\n")
                 for p in resultado:
-                    print(f"""
-Nome:               {p.Nome_membro}\n
-Titulação:          {p.titulacao}\n
-Descrição:          {p.descricao_membro}\n
-Departamento:       {p.Departamento}\n
-Área de atuação:    {p.Nome_area_atuacao}\n
-Email:              {p.Email}\n
-País:               {p.pais}\n
-UF:                 {p.UF}\n
-""")
+                    print(
+                        f"Nome:                                 {p[1]}\n"
+                        f"Titulação:                            {p[2]}\n"
+                        f"Departamento:                         {p[3]}\n"
+                        f"Descrição:                            {p[4]}\n"
+                        f"Área de atuação:                      {p[5]}\n"
+                        f"Email:                                {p[6]}\n"
+                        f"Quantidade de projetos que participa: {p[7]}\n")
 
                     print("\n\n==========================\n")
                     time.sleep(1)
                 print("\n\nTotal de pesquisadores encontrados: ", len(resultado))
             else:
-                input("Erro no acesso ao banco de dados.")
+                print("==========================\n"
+                "Nenhum Pesquisador encontrado com os critérios informados."
+                "\n==========================")
+
 
         print("\n\nDeseja pesquisar novamente? (S/N)")
         choice = input().strip().upper()
@@ -165,23 +175,24 @@ UF:                 {p.UF}\n
         resultado = instituicao.info_instituicao(self.cursor)
 
         clear()
-        if resultado != None:
+        if resultado != [[]]:
             print("\n\nInstituições encontradas:")
             print("\n==========================\n\n")
             for i in resultado:
                 print(f"""
-Nome:       {i.Nome}\n
-CNPJ:       {i.CNPJ}\n
-Sigla:      {i.Sigla}\n
-Descrição:  {i.Descricao}\n
-UF:         {i.UF}\n
-Localidade: {i.Localidade}\n
+Nome:       {i[0]}\n
+CNPJ:       {i[1]}\n
+Sigla:      {i[2]}\n
+Descrição:  {i[3]}\n
+UF:         {i[4]}\n
+Localidade: {i[5]}\n
 """)
                 print("\n\n==========================\n")
                 time.sleep(1)
             print("\n\nTotal de instituições encontradas: ", len(resultado))
         else:
-            input("Erro no acesso ao banco de dados.")
+            print("Nenhum projeto encontrado com os critérios informados.")
+
 
         print("\n\nDeseja pesquisar novamente? (S/N)")
         choice = input().strip().upper()
@@ -189,7 +200,6 @@ Localidade: {i.Localidade}\n
             self.search_instituicao()
         else:
             return
-                
 
     def menu(self):
         options = ["Voltar", "Pesquisar por Projeto", "Pesquisar por pesquisador", "Pesquisar por instituição"]
@@ -211,7 +221,7 @@ Localidade: {i.Localidade}\n
             
             match(choice):
                 case 1:
-                    self.search_project()
+                    self.search_projects()
 
                 case 2:
                     self.search_pesquisador()
