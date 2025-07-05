@@ -24,7 +24,7 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
         create_database(password=password, db_name='db_pesquisas')
         create_tables_sql_script(password=password, db_name='db_pesquisas', sql_script_path='media/script_db.sql')
         conexao = connect_to_database(database_name='db_pesquisas', password=password)
-
+    
         if isinstance(conexao, Exception):
             erro_str = str(conexao)
 

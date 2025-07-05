@@ -2,6 +2,72 @@ from utils import *
 from models_db import *
 import time
 
+def titulo(tipo_pesquisa):
+    match(tipo_pesquisa):
+        case "pro":
+            clear()
+            print("==========================\n"
+                "   Pesquisa por Projeto   \n"
+                "==========================\n\n"
+                "Preencha os dados a seguir para pesquisar um projeto\n"
+                "deixe em branco para pesquisar todos os projetos\n")
+            nome_projeto = input("Nome do projeto: ").strip() or ""
+            tipo_projeto = input("Tipo do projeto: ").strip() or ""
+            linha_pesquisa = input("Linha de pesquisa: ").strip() or ""
+            area_atuação = input("Área de atuação: ").strip() or ""
+            nome_membro = input("Nome do membro: ").strip() or ""
+            nome_instituicao = input("Nome da instituição fomentadora: ").strip() or ""
+            time.sleep(2)
+            return [nome_projeto, tipo_projeto, linha_pesquisa, area_atuação, nome_membro, nome_instituicao]
+        
+        case "pesq":
+            clear()
+            print("==========================\n"
+                " Pesquisa por Pesquisador  \n"
+                "==========================\n\n"
+                "Preencha os dados a seguir para pesquisar um pesquisador\n"
+                "deixe em branco para pesquisar todos os pesquisadores\n")
+            nome_pesquisador = input("Nome do pesquisador: ").strip() or ""
+            instituicao = input("Instituição: ").strip() or ""
+            area_atuacao = input("Área de atuação: ").strip() or ""
+            time.sleep(2)
+
+            return [nome_pesquisador, instituicao, area_atuacao]
+
+        case "inst":
+            clear()
+            print("==========================\n"
+                " Pesquisa por Instituição  \n"
+                "==========================\n\n"
+                "Preencha os dados a seguir para pesquisar uma instituição\n"
+                "deixe em branco para pesquisar todas as instituições\n")
+            nome_instituicao = input("Nome da instituição: ").strip() or ""
+            sigla = input("Sigla: ").strip() or ""
+            cnpj = input("CNPJ: ").strip() or ""
+            natureza_juridica = input("Natureza jurídica: ").strip() or ""
+            uf = input("UF: ").strip() or ""
+            localidade = input("Localidade: ").strip() or ""
+            time.sleep(2)
+
+            return [nome_instituicao, sigla, cnpj, natureza_juridica, uf, localidade]
+        
+        case "est":
+            clear()
+            print("==========================\n"
+                " Pesquisa por Estudante  \n"
+                "==========================\n\n"
+                "Preencha os dados a seguir para pesquisar um estudante\n"
+                "deixe em branco para pesquisar todas os estudantes\n")
+            nome_estudante = input("Nome do estudante: ").strip() or ""
+            titulacao = input("Titulação: ").strip() or ""
+            descricao = input("Descrição: ").strip() or ""
+            matricula = input("Matrícula: ").strip() or ""
+            curso_estudante = input("Curso: ").strip() or ""
+            time.sleep(2)
+
+            return [nome_estudante, titulacao, descricao, matricula, curso_estudante]
+
+
 class ISearch:
     def __init__(self, cursor, tipo_conta=""):
         self.cursor = cursor
@@ -154,6 +220,8 @@ class ISearch:
         else:
             return
     
+    
+
     def search_instituicao(self):
         clear()
         print("==========================\n"
@@ -164,29 +232,43 @@ class ISearch:
         nome_instituicao = input("Nome da instituição: ").strip() or ""
         sigla = input("Sigla: ").strip() or ""
         cnpj = input("CNPJ: ").strip() or ""
+        natureza_juridica = input("Natureza jurídica: ").strip() or ""
+        uf = input("UF: ").strip() or ""
+        localidade = input("Localidade: ").strip() or ""
         time.sleep(2)
 
         instituicao = Pesquisa_instituicao(
             nome_instituicao=nome_instituicao,
             cnpj=cnpj,
-            sigla=sigla
+            sigla=sigla,
+            natureza_juridica=natureza_juridica,
+            uf=uf,
+            localidade=localidade
         )
         
         resultado = instituicao.info_instituicao(self.cursor)
+
+        instituicoes = {}
 
         clear()
         if resultado != [[]]:
             print("\n\nInstituições encontradas:")
             print("\n==========================\n\n")
             for i in resultado:
-                print(f"""
-Nome:       {i[0]}\n
-CNPJ:       {i[1]}\n
-Sigla:      {i[2]}\n
-Descrição:  {i[3]}\n
-UF:         {i[4]}\n
-Localidade: {i[5]}\n
-""")
+                instituicao[i[0]] = i[1:]
+                print(
+                    f"CNPJ:                 {i[0]}\n"
+                    f"Nome:                 {i[1]}\n"
+                    f"Sigla:                {i[2]}\n"
+                    f"Natureza Jurídica:    {i[3]}\n"
+                    f"Descrição:            {i[3]}\n"
+                    f"UF:                   {i[4]}\n"
+                    f"Localidade:           {i[5]}\n"
+                    f"Recursos Investidos:  {i[6]}\n"
+                    f"Projetos financiados:"
+                    f"{i[7]}\n"
+                    f"Projetos fomentados:"
+                    f"{i[8]}\n")
                 print("\n\n==========================\n")
                 time.sleep(1)
             print("\n\nTotal de instituições encontradas: ", len(resultado))

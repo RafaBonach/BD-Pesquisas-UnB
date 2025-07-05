@@ -155,40 +155,122 @@ class Pesquisa_pesquisador:
         except pyodbc.Error as e:
             print(f"Erro ao executar a consulta: {e}")
             return None
+
+class Pesquisa_estudante:
+    def __init__(self, id=None, nome_estudante="", titulacao="", descricao="", matricula="", curso_estudante=""):
+        self.id = id
+        self.nome_estudante = nome_estudante
+        self.titulacao = titulacao
+        self.descricao = descricao
+        self.matricula = matricula
+        self.curso_estudante = curso_estudante
+
+    def info_estudante(self, cursor):
+        operacao = ""
+        if self.id is not None:
+            operacao += f"Id_Estudante = {self.id} AND "
+
+        if self.nome_estudante != "":
+            operacao += f"Nome LIKE '%{self.nome_estudante}%' AND "
         
+        if self.titulacao != "":
+            operacao += f"Titulacao LIKE '%{self.titulacao}%' AND "
+
+        if self.descricao != "":
+            operacao += f"Descrição LIKE '%{self.descricao}%' AND "
+
+        if self.matricula != "":
+            operacao += f"Matricula LIKE '%{self.matricula}%' AND "
+
+        if self.curso_estudante != "":
+            operacao += f"Curso LIKE '%{self.curso_estudante}%' AND "
+
+        if operacao != "":
+            operacao = operacao[:-5]
+
+            script = f"""
+            SELECT MEMBRO.Id_Membro id, Nome, MEMBRO.Titulação titulacao, Descrição descricao_estudante, Matrícula matricula, Curso_estudante Curso, STRING_AGG(Email, ', ') as email_estudante, STRING_AGG(País, ', ') as pais, STRING_AGG(UF, ', ') as uf, STRING_AGG(Cidade, ', ') as cidade, STRING_AGG(PROJETO.Título, E'\n') AS Projetos, COUNT(PROJETO.Cod_Proj) as num_projetos
+            FROM MEMBRO, LOCALIDADE, Origem, Email, Realiza, PROJETO
+            WHERE (MEMBRO.Id_Membro = Origem.Id_Membro AND Origem.Cod_postal = LOCALIDADE.Cod_postal) AND
+                    (Email.id_membro = MEMBRO.Id_Membro) AND
+                    (Realiza.Id_Estudante = MEMBRO.Id_Membro AND Realiza.Cod_Proj = PROJETO.Cod_Proj) AND
+                    {operacao}
+            GROUP BY id, Nome, Titulacao, Descrição, Matricula, Curso;"""
+        
+        else:
+            script = f"""
+            SELECT MEMBRO.Id_Membro id, Nome, MEMBRO.Titulação titulacao, Descrição descricao_estudante, Matrícula matricula, Curso_estudante Curso, STRING_AGG(Email, ', ') as email_estudante, STRING_AGG(País, ', ') as pais, STRING_AGG(UF, ', ') as uf, STRING_AGG(Cidade, ', ') as cidade, STRING_AGG(PROJETO.Título, E'\n') AS Projetos, COUNT(PROJETO.Cod_Proj) as num_projetos
+            FROM MEMBRO, LOCALIDADE, Origem, Email, Realiza, PROJETO
+            WHERE (MEMBRO.Id_Membro = Origem.Id_Membro AND Origem.Cod_postal = LOCALIDADE.Cod_postal) AND
+                    (Email.id_membro = MEMBRO.Id_Membro) AND
+                    (Realiza.Id_Estudante = MEMBRO.Id_Membro AND Realiza.Cod_Proj = PROJETO.Cod_Proj)
+            GROUP BY id, Nome, Titulacao, Descrição, Matricula, Curso;"""
+        
+        try:
+            cursor.execute(script)
+            resultados = cursor.fetchall()
+            return {resultado[0]:resultado[1:] for resultado in resultados}
+            
+        except pyodbc.Error as e:
+            print(f"Erro ao executar a consulta: {e}")
+            return None
+        
+
 class Pesquisa_instituicao:
-    def __init__(self, nome_instituicao="", sigla="", CNPJ=""):
+    def __init__(self, nome_instituicao="", sigla="", cnpj="", natureza_juridica="", uf="", localidade=""):
         self.nome_instituicao = nome_instituicao
-        self.CNPJ = CNPJ
+        self.cnpj = cnpj
         self.sigla = sigla
+        self.natureza_juridica = natureza_juridica
+        self.uf = uf
+        self.localidade = localidade
     
     
     def info_instituicao(self, cursor):
         operacao = ""
-        if self.CNPJ != "":
-            operacao += f"CNPJ = {self.CNPJ} AND"
+        if self.cnpj != "":
+            operacao += f"cnpj = {self.cnpj} AND"
 
         if self.nome_instituicao != "":
             operacao += f"Nome LIKE '%{self.nome_instituicao}%' AND"
 
         if self.sigla != "":
             operacao += f"Sigla LIKE '%{self.sigla}%' AND"
+
+        if self.natureza_juridica != "":
+            operacao += f"Natureza_Juríd LIKE '%{self.natureza_juridica}%' AND"
+        
+        if self.uf != "":
+            operacao += f"UF LIKE '%{self.uf}%' AND"
+
+        if self.localidade != "":
+            operacao += f"Localidade LIKE '%{self.localidade}%' AND"
         
 
         if operacao != "":
             operacao = operacao[:-4]
 
             script = f"""
-SELECT Nome, CNPJ, Sigla, Descrição, UF, Localidade
-FROM INSTITUICAO
-WHERE {operacao}
-order by Nome;"""
+            SELECT INSTITUICAO.CNPJ cnpj, Nome, Sigla, Natureza_Juríd, Descrição descricao, UF, Localidade, Recursos_Investidos, STRING_AGG(id_proj_financiado || ' - ' || nome_proj_financiado, E'\n') AS Projetos_financiados, STRING_AGG(PROJETO.Cod_Proj || ' - ' || Título, E'\n') AS Projetos_fomentados
+            FROM INSTITUICAO, PROJETO, Fomenta, (
+                SELECT PROJETO.Cod_Proj id_proj_financiado, Título nome_proj_financiado, INSTITUICAO.CNPJ cnpj_instituicao, Nome nome_instituicao
+                FROM PROJETO, Financia, INSTITUICAO
+                WHERE (INSTITUICAO.CNPJ = Financia.CNPJ AND PROJETO.Cod_Proj = Financia.Cod_Proj)) AS Financia
+            WHERE (INSTITUICAO.CNPJ = Fomenta.CNPJ AND PROJETO.Cod_Proj = Fomenta.Cod_Proj) AND
+                    (INSTITUICAO.CNPJ = Financia.cnpj_instituicao) AND
+                    {operacao}
+            GROUP BY INSTITUICAO.CNPJ, Nome, Sigla, Natureza_Juríd, Descrição, UF, Localidade, Recursos_Investidos;"""
         
         else:
             script = f"""
-SELECT Nome, CNPJ, Sigla, UF, Localidade, Descrição
-FROM INSTITUICAO
-order by Nome;"""
+            SELECT INSTITUICAO.CNPJ cnpj, Nome, Sigla, Natureza_Juríd, Descrição descricao, UF, Localidade, Recursos_Investidos, STRING_AGG(id_proj_financiado || ' - ' || nome_proj_financiado, E'\n') AS Projetos_financiados, STRING_AGG(PROJETO.Cod_Proj || ' - ' || Título, E'\n') AS Projetos_fomentados
+            FROM INSTITUICAO, PROJETO, Fomenta, (
+                SELECT PROJETO.Cod_Proj id_proj_financiado, Título nome_proj_financiado, INSTITUICAO.CNPJ cnpj_instituicao, Nome nome_instituicao
+                FROM PROJETO, Financia, INSTITUICAO
+                WHERE (INSTITUICAO.CNPJ = Financia.CNPJ AND PROJETO.Cod_Proj = Financia.Cod_Proj)) AS Financia
+            WHERE (INSTITUICAO.CNPJ = Fomenta.CNPJ AND PROJETO.Cod_Proj = Fomenta.Cod_Proj) AND
+                    (INSTITUICAO.CNPJ = Financia.cnpj_instituicao)
+            GROUP BY INSTITUICAO.CNPJ, Nome, Sigla, Natureza_Juríd, Descrição, UF, Localidade, Recursos_Investidos;"""
             
         try:
             cursor.execute(script)
@@ -198,53 +280,7 @@ order by Nome;"""
             print(f"Erro ao executar a consulta: {e}")
             return None
         
-    
-    def info_instituicao_detalhado(self, cursor):
-        operacao = ""
-        if self.CNPJ != "":
-            operacao += f"CNPJ = {self.CNPJ} AND"
 
-        if self.nome_instituicao != "":
-            operacao += f"Nome LIKE '%{self.nome_instituicao}%' AND"
-
-        if self.sigla != "":
-            operacao += f"Sigla LIKE '%{self.sigla}%' AND"
-        
-        if operacao != "":
-            operacao = operacao[:-4]
-
-            script = f"""
-SELECT *
-FROM (
-    SELECT Nome, INSTITUICAO.CNPJ CNPJ, Sigla, UF, Localidade, Natureza_Juríd, Descrição, CNAE, COUNT(Fomenta.CNPJ) AS qtd_projetos_fomentados, count(Financia.CNPJ) AS qtd_projetos_financiados
-    FROM INSTITUICAO, CNAE, Financia, Fomenta
-    WHERE (INSTITUICAO.CNPJ = CNAE.CNPJ_Instituicao) AND
-            (INSTITUICAO.CNPJ = Fomenta.CNPJ OR INSTITUICAO.CNPJ = Financia.CNPJ)
-    group by INSTITUICAO.CNPJ, CNAE
-    )
-WHERE {operacao}
-order by Nome;"""
-        
-        else:
-            script = f"""
-SELECT *
-FROM (
-    SELECT Nome, INSTITUICAO.CNPJ CNPJ, Sigla, UF, Localidade, Natureza_Juríd, Descrição, CNAE, COUNT(Fomenta.CNPJ) AS qtd_projetos_fomentados, count(Financia.CNPJ) AS qtd_projetos_financiados
-    FROM INSTITUICAO, CNAE, Financia, Fomenta
-    WHERE (INSTITUICAO.CNPJ = CNAE.CNPJ_Instituicao) AND
-            (INSTITUICAO.CNPJ = Fomenta.CNPJ OR INSTITUICAO.CNPJ = Financia.CNPJ)
-    group by INSTITUICAO.CNPJ, CNAE
-    )
-order by Nome;"""
-            
-        try:
-            cursor.execute(script)
-            resultados = cursor.fetchall()
-            return resultados
-        except pyodbc.Error as e:
-            print(f"Erro ao executar a consulta: {e}")
-            return None
-        
 class Projeto:
     def __init__(self, tipo_projeto, titulo, resumo="", data_inicio="", data_final="", linha_pesquisa="", area_atuacao=""):
         self.titulo = titulo
@@ -282,6 +318,7 @@ class Projeto:
         except pyodbc.Error as e:
             print(f"Erro ao criar o projeto: {e}")
             return False
+
 
 
 def insert_account(cursor, acc_type, acc_name, acc_password):
