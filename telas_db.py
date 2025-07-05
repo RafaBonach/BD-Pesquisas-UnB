@@ -1,20 +1,68 @@
-import  pyodbc
+import pyodbc
 from backend_db import connect_to_database # Para usar a função de conexão
 
 ### TELA INSTITUIÇÃO ###
-
-## Inserção ##
-def inserir_instituicao(conexao, cnpj, nome, sigla, natureza_jurid, uf, localidade, recursos_investidos, descricao):
+## VERIFICAÇÕES 
+def instituicao_existe(conexao, cnpj):
+    """Verifica se uma instituição já existe pelo CNPJ."""
     try:
         cursor = conexao.cursor()
-        cursor.exwcute("""
-            INSERT INTO INSTITUICAO (CNPJ, Nome, Sigla, Natureza_Jurid, UF, Localidade, Recursos_Investidos, Descrição)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (cnpj, nome, sigla, natureza_jurid, uf, localidade, recursos_investidos, descricao))
+        cursor.execute("SELECT 1 FROM INSTITUICAO WHERE CNPJ = ?", (cnpj,))
+        return cursor.fetchone() is not None
+    except Exception as e:
+        print("Erro ao verificar instituição:", e)
+        return False
+
+def membro_existe(conexao, id_membro):
+    """Verifica se um membro já existe pelo Id_Membro."""
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("SELECT 1 FROM MEMBRO WHERE Id_Membro = ?", (id_membro,))
+        return cursor.fetchone() is not None
+    except Exception as e:
+        print("Erro ao verificar membro:", e)
+        return False
+
+def email_existe(conexao, email, id_membro):
+    """Verifica se um e-mail já está cadastrado para o membro."""
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("SELECT 1 FROM Email WHERE Email = ? AND id_membro = ?", (email, id_membro))
+        return cursor.fetchone() is not None
+    except Exception as e:
+        print("Erro ao verificar e-mail:", e)
+        return False
+
+def cnae_existe(conexao, cnpj_instituicao, cnae):
+    """Verifica se um CNAE já está cadastrado para a instituição."""
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("SELECT 1 FROM CNAE WHERE CNPJ_Instituicao = ? AND CNAE = ?", (cnpj_instituicao, cnae))
+        return cursor.fetchone() is not None
+    except Exception as e:
+        print("Erro ao verificar CNAE:", e)
+        return False
+
+
+
+
+
+################################
+## Inserção ##
+def inserir_instituicao(conexao, cnpj, nome, sigla, natureza_jurid, uf, localidade, recursos_investidos, descricao):
+    if instituicao_existe(conexao, cnpj):
+        print(f"Instituição com CNPJ {cnpj} já existe. Não é possível inserir duplicado.")
+        return
+    try:
+        cursor = conexao.cursor()
+        cursor.execute(f"""
+            INSERT INTO INSTITUICAO (CNPJ, Nome, Sigla, Natureza_Juríd, UF, Localidade, Recursos_Investidos, Descrição)
+            VALUES ({cnpj}, '{nome}', '{sigla}', '{natureza_jurid}', '{uf}', '{localidade}', {recursos_investidos}, '{descricao}')
+        """)
         conexao.commit()
         print("Instituição inserida com sucesso!")
     except pyodbc.Error as e:
-        print("Errp ao inserir instituição:", e)
+        print("Erro ao inserir instituição:", e)
 
 ## Atualização ##    
 def atualizar_instituicao(conexao, cnpj, nome=None, sigla=None, natureza_jurid=None, uf=None, localidade=None, recursos_investidos=None, descricao=None):
@@ -54,12 +102,15 @@ def deletar_instituicao(conexao, cnpj):
 ### TELA MEMBRO
 # Inserção do membro externo
 def inserir_membro_externo(conexao, id_membro, nome, titulacao, descricao=None):
+    if membro_existe(conexao, id_membro):
+        print(f"Membro com Id_Membro {id_membro} já existe. Não é possível inserir duplicado.")
+        return
     try:
         cursor = conexao.cursor()
-        cursor.execute("""
+        cursor.execute(f"""
             INSERT INTO MEMBRO (id_Membro, Nome, Titulação,  Descrição)
-            VALUES (?, ?, ?, ?)
-        """, (id_membro, nome, titulacao, descricao))
+            VALUES ({id_membro}, '{nome}', '{titulacao}', '{descricao}')
+        """)
         conexao.commit()
         print("Membro externo inserido com sucesso!")
     except pyodbc.Error as  e:
@@ -67,24 +118,30 @@ def inserir_membro_externo(conexao, id_membro, nome, titulacao, descricao=None):
 
 # Inserção do estudante
 def inserir_estudante(conexao, id_membro, nome, titulacao, descricao, matricula, curso_estudante):
+    if membro_existe(conexao, id_membro):
+        print(f"Membro com Id_Membro {id_membro} já existe. Não é possível inserir duplicado.")
+        return
     try:
         cursor = conexao.cursor()
-        cursor.execute("""
+        cursor.execute(f"""
             INSERT INTO MEMBRO (Id_Membro, Nome, Titulação, Descrição, Matrícula, Curso_estudante)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (id_membro, nome, titulacao, descricao, matricula, curso_estudante))
+            VALUES ({id_membro}, '{nome}', '{titulacao}', '{descricao}', {matricula}, '{curso_estudante}')
+        """)
         conexao.commit()
         print("Estudante inserido com sucesso!")
     except pyodbc.Error as e:
         print("Erro ao inserir estudante:", e)
 
 def inserir_pesquisador(conexao, id_membro, nome, titulacao, descricao, departamento):
+    if membro_existe(conexao, id_membro):
+        print(f"Membro com Id_Membro {id_membro} já existe. Não é possível inserir duplicado.")
+        return
     try:
         cursor = conexao.cursor()
-        cursor.execute("""
+        cursor.execute(f"""
             INSERT INTO MEMBRO (Id_Membro, Nome, Titulação, Descrição, Departamento)
-            VALUES (?, ?, ?, ?, ?)
-        """, (id_membro, nome, titulacao, descricao, departamento))
+            VALUES ({id_membro}, '{nome}', '{titulacao}', '{descricao}', '{departamento}')
+        """)
         conexao.commit()
         print("Pesquisador inserido com sucesso!")
     except pyodbc.Error as e:
@@ -124,18 +181,24 @@ def deletar_membro(conexao, id_membro):
 ### PARA ATRIBUTOS MULTIVALORADOS
 ## CRUD PARA EMAIL(MEMBRO)
 def inserir_email(conexao, email, id_membro):
+    if email_existe(conexao, email, id_membro):
+        print(f"E-mail '{email}' já está cadastrado para o membro {id_membro}. Não é possível inserir duplicado.")
+        return
     try:
         cursor = conexao.cursor()
-        cursor.execute("""
-            INSERT INTO Email (Email, id_membro)
-            VALUES (?, ?)
-        """, (email, id_membro))
+        cursor.execute(f"""
+            INSERT INTO Email (id_membro, Email)
+            VALUES ({id_membro}, '{email}')
+        """)
         conexao.commit()
         print("Email inserido com sucesso!")
     except pyodbc.Error as e:
         print("Erro ao inserir email:", e)
 
 def atualizar_email(conexao, email_antigo, id_membro, email_novo):
+    if email_existe(conexao, email_novo, id_membro):
+        print(f"E-mail '{email_novo}' já está cadastrado para o membro {id_membro}. Não é possível atualizar para duplicado.")
+        return
     try:
         cursor = conexao.cursor()
         cursor.execute("""
@@ -163,18 +226,24 @@ def deletar_email(conexao, email, id_membro):
 ## CRUD PARA CNAE(INSTITUIÇÃO)
 
 def inserir_cnae(conexao, cnpj_instituicao, cnae):
+    if cnae_existe(conexao, cnpj_instituicao, cnae):
+        print(f"CNAE '{cnae}' já está cadastrado para a instituição {cnpj_instituicao}. Não é possível inserir duplicado.")
+        return
     try:
         cursor = conexao.cursor()
-        cursor.execute("""
-            INSERT INTO CNAE (CNPJ_Instituicao, CNAE
-            VALUES (?, ?)
-        """, (cnpj_instituicao, cnae))
+        cursor.execute(f"""
+            INSERT INTO CNAE (CNPJ_Instituicao, CNAE)
+            VALUES ({cnpj_instituicao}, '{cnae}')
+        """)
         conexao.commit()
         print("CNAE inserido com sucesso!")
     except pyodbc.Error as e:
         print("Erro ao inserir CNAE:", e)
 
 def atualizar_cnae(conexao, cnpj_instituicao, cnae_antigo, cnae_novo):
+    if cnae_existe(conexao, cnpj_instituicao, cnae_novo):
+        print(f"CNAE '{cnae_novo}' já está cadastrado para a instituição {cnpj_instituicao}. Não é possível atualizar para duplicado.")
+        return
     try:
         cursor = conexao.cursor()
         cursor.execute("""
@@ -186,15 +255,3 @@ def atualizar_cnae(conexao, cnpj_instituicao, cnae_antigo, cnae_novo):
         print("CNAE atualizado com sucesso!")
     except pyodbc.Error as e:
         print("Erro ao atualizar CNAE:", e)
-
-def deletar_cnae(conexao, cnpj_instituicao, cnae):
-    try:
-        cursor = conexao.cursor()
-        cursor.execute("""
-            DELETE FROM CNAE
-            WHERE CNPJ_Instituicao = ? AND CNAE = ?
-        """, (cnpj_instituicao, cnae))
-        conexao.commit()
-        print("CNAE deletado com sucesso!")
-    except pyodbc.Error as e:
-        print("Erro ao deletar CNAE:", e)

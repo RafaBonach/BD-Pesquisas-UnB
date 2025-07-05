@@ -1,4 +1,4 @@
-CREATE TABLE MEMBRO (
+CREATE TABLE IF NOT EXISTS MEMBRO (
   Id_Membro        INT          PRIMARY KEY,
   Nome             VARCHAR(45)  NOT NULL,
   Titulação        VARCHAR(15)  NOT NULL,
@@ -13,12 +13,12 @@ CREATE TABLE MEMBRO (
 );
 
 /* Projeto tem um tipo */
-CREATE TABLE TIPO_PROJETO (
+CREATE TABLE IF NOT EXISTS TIPO_PROJETO (
   Id_Tipo_Proj  INT          PRIMARY KEY,
   Nome_Tipo     VARCHAR(20)  NOT NULL
 );
 
-CREATE TABLE PROJETO (
+CREATE TABLE IF NOT EXISTS PROJETO (
   Cod_Proj        INT          UNIQUE,
   Id_Tipo_Proj    INT          UNIQUE,
   Título          VARCHAR(75)  NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE PROJETO (
   FOREIGN KEY  (Id_Tipo_Proj)    REFERENCES TIPO_PROJETO(Id_Tipo_Proj)
 );
 
-CREATE TABLE INSTITUICAO (
+CREATE TABLE IF NOT EXISTS INSTITUICAO (
   CNPJ                 INT          PRIMARY KEY,
   Nome                 VARCHAR(40)  NOT NULL,
   Sigla                VARCHAR(10),
@@ -41,33 +41,33 @@ CREATE TABLE INSTITUICAO (
   Descrição            text
 );
 
-CREATE TABLE CONGRESSO (
+CREATE TABLE IF NOT EXISTS CONGRESSO (
   Id_Congresso  INT          PRIMARY KEY,
   Nome          VARCHAR(45)  NOT NULL,
   Descricao     text
 );
 
-CREATE TABLE LINHA_PESQUISA (
+CREATE TABLE IF NOT EXISTS LINHA_PESQUISA (
   Id_Linha_Pesquisa  INT          PRIMARY  KEY,
   Nome               VARCHAR(45)  NOT NULL,
   Descrição          text
 );
 
-CREATE TABLE AREA_ATUACAO (
+CREATE TABLE IF NOT EXISTS AREA_ATUACAO (
   Id_Area_Atuacao  INT          PRIMARY KEY,
   Abrangencia      VARCHAR(12)  NOT NULL,
   Nome             VARCHAR(45)  NOT NULL,
   Descrição        text
 );
 
-CREATE TABLE LOCALIDADE (
+CREATE TABLE IF NOT EXISTS LOCALIDADE (
   Cod_postal  INT          PRIMARY KEY,
   País        VARCHAR(45)  NOT NULL,
   UF          CHAR(2)      NOT NULL,
   Cidade      VARCHAR(45)  NOT NULL
 );
 
-CREATE TABLE PATRIMONIO (
+CREATE TABLE IF NOT EXISTS PATRIMONIO (
   Cod_Proj       INT,
   Id_Patrimonio  INT,
   Nome           VARCHAR(30)  NOT NULL,
@@ -80,7 +80,7 @@ CREATE TABLE PATRIMONIO (
 
 
 /* Email de membro (multivalorado) */
-CREATE TABLE Email (
+CREATE TABLE IF NOT EXISTS Email (
   Email      VARCHAR(30),
   id_membro  INT,
 
@@ -89,7 +89,7 @@ CREATE TABLE Email (
 );
 
 /* Membro tem origem em Localidade */
-CREATE TABLE Origem (
+CREATE TABLE IF NOT EXISTS Origem (
   Cod_postal  INT,
   Id_Membro   INT,
 
@@ -99,7 +99,7 @@ CREATE TABLE Origem (
 );
 
 /* Pesquisador atua em Área de atuação */
-CREATE TABLE Atua (
+CREATE TABLE IF NOT EXISTS Atua (
   Id_Pesquisador   INT,
   Id_Area_Atuacao  INT,
 
@@ -109,7 +109,7 @@ CREATE TABLE Atua (
 );
 
 /* Pesquisador pesquisa Projeto */
-CREATE TABLE Pesquisa (
+CREATE TABLE IF NOT EXISTS Pesquisa (
   Id_Pesquisador  INT,
   Cod_Proj        INT,
   Funcao          VARCHAR(12)  NOT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE Pesquisa (
 );
 
 /* Estudante realiza Projeto */
-CREATE TABLE Realiza (
+CREATE TABLE IF NOT EXISTS Realiza (
   Id_Estudante  INT,
   Cod_Proj      INT,
 
@@ -131,7 +131,7 @@ CREATE TABLE Realiza (
 
 
 /* Projeto possui Localidade */
-CREATE TABLE Possui (
+CREATE TABLE IF NOT EXISTS Possui (
   Cod_Proj    INT,
   Cod_postal  INT,
 
@@ -141,7 +141,7 @@ CREATE TABLE Possui (
 );
 
 /* Projeto vincula Área de atuação */
-CREATE TABLE Vincula (
+CREATE TABLE IF NOT EXISTS Vincula (
   Cod_Proj         INT,
   Id_Area_Atuacao  INT,
 
@@ -151,7 +151,7 @@ CREATE TABLE Vincula (
 );
 
 /* Projeto executa uma Linha de pesquisa */
-CREATE TABLE Executa (
+CREATE TABLE IF NOT EXISTS Executa (
   Cod_Proj           INT,
   Id_Linha_Pesquisa  INT,
 
@@ -161,7 +161,7 @@ CREATE TABLE Executa (
 );
 
 /* Projeto participa de um Congresso */
-CREATE TABLE Participa (
+CREATE TABLE IF NOT EXISTS Participa (
   Id_Proj       INT,
   Id_Congresso  INT,
   Objetivo      text,
@@ -173,16 +173,16 @@ CREATE TABLE Participa (
 
 
 /* Instituição tem múltiplos CNAE */
-CREATE TABLE CNAE (
+CREATE TABLE IF NOT EXISTS CNAE (
   CNPJ_Instituicao  INT,
   CNAE              VARCHAR(20),
   
   PRIMARY KEY  (CNPJ_Instituicao, CNAE),
-  FOREIGN KEY  (CNPJ_Instituicao)  REFERENCES  INSTITUICAO(CNPJ)
+  FOREIGN KEY  (CNPJ_Instituicao)  REFERENCES  INSTITUICAO(CNPJ) ON DELETE CASCADE
 );
 
 /* Instituição financia Projeto */
-CREATE TABLE Financia (
+CREATE TABLE IF NOT EXISTS Financia (
   Cod_Proj  INT,
   CNPJ      INT,
 
@@ -192,7 +192,7 @@ CREATE TABLE Financia (
 );
 
 /* Instituição fomenta Projeto */
-CREATE TABLE Fomenta (
+CREATE TABLE IF NOT EXISTS Fomenta (
   CNPJ      INT,
   Cod_Proj  INT,
   Tipo      VARCHAR(20)  NOT NULL,
@@ -204,7 +204,7 @@ CREATE TABLE Fomenta (
 
 
 /* Congresso tem edição */
-CREATE TABLE Edicao (
+CREATE TABLE IF NOT EXISTS Edicao (
   Id_Congresso  INT,
   Cod_edicao    INT,
 
