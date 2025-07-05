@@ -4,7 +4,8 @@
 from utils import *
 from backend_db import *
 from interfaces.i_account import IAccount
-from interfaces.i_search import ISearch
+from interfaces.i_search import *
+from interfaces.i_project import IProject
 import time
 import getpass
 
@@ -58,10 +59,10 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
         
         time.sleep(2)
     
-    options = ["Sair", "Gerenciar conta", "Pesquisar projetos e pesquisadores"]
+    options = ["Sair", "Gerenciar conta", "Pesquisar projetos e pesquisadores", "Gerenciar projetos"]
 
     while True:
-        clear()
+        #clear()
         print("==========================\n"
               " Gerenciador de Projetos  \n"
               "    de Pesquisa da UnB    \n"
@@ -87,5 +88,8 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
                 i_acc.run()
             
             case 2:
-                i_search = ISearch(conexao.cursor())
-                i_search.menu()
+                menu(conexao.cursor())
+            
+            case 3:
+                i_proj = IProject(conexao.cursor())
+                i_proj.run()

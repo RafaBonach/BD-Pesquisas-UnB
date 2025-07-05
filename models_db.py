@@ -4,9 +4,9 @@
 """
 import pyodbc
 
-
 class Pesquisa_projeto:
-    def __init__(self, projeto="", nome_instituicao="", nome_membro="", tipo_projeto="", linha_pesquisa="", area_atuacao=""):
+    def __init__(self, id="", projeto="", nome_instituicao="", nome_membro="", tipo_projeto="", linha_pesquisa="", area_atuacao=""):
+        self.id = id
         self.projeto = projeto
         self.nome_instituicao = nome_instituicao
         self.nome_membro = nome_membro
@@ -16,6 +16,9 @@ class Pesquisa_projeto:
 
     def resultado_pesquisa(self, cursor):
         operacao = ""
+        if self.id != "":
+            operacao += f"PROJETO.Cod_Proj = {self.id} AND "
+
         if self.projeto != "":
             operacao += f"titulo LIKE '%{self.projeto}%' AND "
         
@@ -39,7 +42,7 @@ class Pesquisa_projeto:
 
             
             script = f"""
-                SELECT Título titulo, PROJETO.Resumo resumo_proj, Data_inicio, Data_final, STRING_AGG(Nome_Tipo, ', ') AS Nome_Tipo, STRING_AGG(MEMBRO.nome || ' (' || Pesquisa.Funcao || ')', E'\n') AS Nome_membro, STRING_AGG(INSTITUICAO.Nome, ', ') AS Nome_instituicao, STRING_AGG(LINHA_PESQUISA.Nome, ', ') AS Linha_pesquisa, STRING_AGG(AREA_ATUACAO.Nome, ', ') AS Nome_area_atuacao, STRING_AGG(CONGRESSO.Nome, ', ') as nome_congresso
+                SELECT PROJETO.Cod_Proj id_proj ,Título titulo, PROJETO.Resumo resumo_proj, Data_inicio, Data_final, STRING_AGG(Nome_Tipo, ', ') AS Nome_Tipo, STRING_AGG(MEMBRO.nome || ' (' || Pesquisa.Funcao || ')', E'\n') AS Nome_membro, STRING_AGG(INSTITUICAO.Nome, ', ') AS Nome_instituicao, STRING_AGG(LINHA_PESQUISA.Nome, ', ') AS Linha_pesquisa, STRING_AGG(AREA_ATUACAO.Nome, ', ') AS Nome_area_atuacao, STRING_AGG(CONGRESSO.Nome, ', ') as nome_congresso
                 FROM PROJETO, MEMBRO, INSTITUICAO, TIPO_PROJETO, LINHA_PESQUISA, AREA_ATUACAO, Pesquisa, Fomenta, Vincula, Executa, CONGRESSO, Participa, Realiza, Financia
                 WHERE ((Pesquisa.Cod_Proj = PROJETO.Cod_Proj AND Pesquisa.Id_Pesquisador = MEMBRO.Id_Membro) OR
                         (PROJETO.Cod_Proj = Realiza.Cod_Proj AND Realiza.Id_Estudante = MEMBRO.Id_Membro)) AND
@@ -55,7 +58,7 @@ class Pesquisa_projeto:
             
         else:
             script = f"""
-                SELECT Título titulo, PROJETO.Resumo resumo_proj, Data_inicio, Data_final, STRING_AGG(Nome_Tipo, ', ') AS Nome_Tipo, STRING_AGG(MEMBRO.nome || ' (' || Pesquisa.Funcao || ')', E'\n') AS Nome_membro_pesquisador, STRING_AGG(INSTITUICAO.Nome, ', ') AS Nome_instituicao, STRING_AGG(LINHA_PESQUISA.Nome, ', ') AS Linha_pesquisa, STRING_AGG(AREA_ATUACAO.Nome, ', ') AS Nome_area_atuacao, STRING_AGG(CONGRESSO.Nome, ', ') as nome_congresso
+                SELECT PROJETO.Cod_Proj, Título titulo, PROJETO.Resumo resumo_proj, Data_inicio, Data_final, STRING_AGG(Nome_Tipo, ', ') AS Nome_Tipo, STRING_AGG(MEMBRO.nome || ' (' || Pesquisa.Funcao || ')', E'\n') AS Nome_membro_pesquisador, STRING_AGG(INSTITUICAO.Nome, ', ') AS Nome_instituicao, STRING_AGG(LINHA_PESQUISA.Nome, ', ') AS Linha_pesquisa, STRING_AGG(AREA_ATUACAO.Nome, ', ') AS Nome_area_atuacao, STRING_AGG(CONGRESSO.Nome, ', ') as nome_congresso
                 FROM PROJETO, MEMBRO, INSTITUICAO, TIPO_PROJETO, LINHA_PESQUISA, AREA_ATUACAO, Pesquisa, Fomenta, Vincula, Executa, CONGRESSO, Participa, Realiza, Financia
                 WHERE ((Pesquisa.Cod_Proj = PROJETO.Cod_Proj AND Pesquisa.Id_Pesquisador = MEMBRO.Id_Membro) OR
                         (PROJETO.Cod_Proj = Realiza.Cod_Proj AND Realiza.Id_Estudante = MEMBRO.Id_Membro)) AND
@@ -217,7 +220,8 @@ class Pesquisa_estudante:
         
 
 class Pesquisa_instituicao:
-    def __init__(self, nome_instituicao="", sigla="", cnpj="", natureza_juridica="", uf="", localidade=""):
+    def __init__(self, id="", nome_instituicao="", sigla="", cnpj="", natureza_juridica="", uf="", localidade=""):
+        self.id = id
         self.nome_instituicao = nome_instituicao
         self.cnpj = cnpj
         self.sigla = sigla
@@ -228,6 +232,8 @@ class Pesquisa_instituicao:
     
     def info_instituicao(self, cursor):
         operacao = ""
+        if self.id != "":
+            operacao += f"INSTITUICAO.CNPJ = '{self.id}' AND "
         if self.cnpj != "":
             operacao += f"cnpj = {self.cnpj} AND"
 
@@ -282,42 +288,167 @@ class Pesquisa_instituicao:
         
 
 class Projeto:
-    def __init__(self, tipo_projeto, titulo, resumo="", data_inicio="", data_final="", linha_pesquisa="", area_atuacao=""):
+    def __init__(self, cod_projeto="", titulo="", resumo="", data_inicio="", data_final="", id_t_projeto="",tipo_projeto="", linha_pesquisa="", area_atuacao=""):
+        # info projeto
+        self.cod_projeto = cod_projeto
         self.titulo = titulo
         self.resumo = resumo
         self.data_inicio = data_inicio
         self.data_final = data_final
-        self.tipo_projeto = tipo_projeto
-        self.linha_pesquisa = linha_pesquisa
-        self.area_atuacao = area_atuacao
+
+        # info tipo projeto
+        self.id_t_projeto = id_t_projeto
+        self.nome_tipo_projeto = tipo_projeto
+
+        # info localizacao
+        self.cod_postal = ""
+
+        # info linha pesquisa
+        self.nome_linha_pesquisa = linha_pesquisa
+        self.desc_linha_pesquisa = ""
+
+        # info membro
+        self.id_membro = ""
+
+        # info area atuacao
+        self.nome_area_atuacao = area_atuacao
+
+        # info congresso
+        self.nome_congresso = ""
+        self.desc_congresso = ""
+        self.cod_edicao_congresso = ""
+
+        # info instituicao
+        self.nome_instituicao = ""
+        self.sigla_instituicao = ""
+        self.cnpj_instituicao = ""
+
+        # info patrimonio
+        self.id_patrimonio = ""
+        self.nome_patrimonio = ""
+        self.custo_patrimonio = ""
+        self.especificacao_patrimonio = ""
+
+    """
+    ====================================================================================
+    CRUD para o tipo de projeto
+    ====================================================================================
+    """
+    def criar_t_projeto(self, cursor):
+        try:
+            script = f"CALL inserir_tipo_projeto('{self.nome_tipo_projeto}');"
+            cursor.execute(script)
+            cursor.commit()
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao criar tipo de projeto: {e}")
+            return False
+
+    def lista_t_projetos(self, cursor):
+        try:
+            if self.id_t_projeto:
+                script = f"SELECT Id_Tipo_Proj, Nome_Tipo FROM TIPO_PROJETO WHERE Id_Tipo_Proj = {self.id_t_projeto};"
+                cursor.execute(script)
+                tipos_projeto = cursor.fetchall()
+                return tipos_projeto
+            elif self.nome_tipo_projeto:
+                script = f"SELECT Id_Tipo_Proj, Nome_Tipo FROM TIPO_PROJETO WHERE Nome_Tipo LIKE '%{self.nome_tipo_projeto}%';"
+                cursor.execute(script)
+                tipos_projeto = cursor.fetchall()
+                return tipos_projeto
+            else:
+                script = "SELECT Id_Tipo_Proj, Nome_Tipo FROM TIPO_PROJETO;"
+                cursor.execute(script)
+                tipos_projeto = cursor.fetchall()
+                return tipos_projeto
+        except pyodbc.Error as e:
+            print(f"Erro ao buscar tipos de projeto: {e}")
+            return None
+        
+    def deleta_t_projeto(self, cursor):
+        try:
+            script = f"CALL deletar_tipo_projeto({self.id_t_projeto});"
+            cursor.execute(script)
+            cursor.commit()
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao deletar tipo de projeto: {e}")
+            return False
+
+    """
+    ==========================================================================================
+        CRUD para o projeto
+    ==========================================================================================
+    """
 
     def cria_projeto(self, cursor):
         try:
-            script = f"""
-            SELECT DISTINCT Id_Tipo_Proj FROM TIPO_PROJETO WHERE Nome_Tipo = '{self.tipo_projeto}';
+            script = f"""CALL inserir_projeto({self.id_t_projeto}, '{self.titulo}', '{self.data_inicio}', '{self.data_final}');"""
+            cursor.execute(script)
+            cursor.commit()
+            if self.resumo:
+                script = f"UPDATE PROJETO SET Resumo = '{self.resumo}' WHERE Título = '{self.titulo}';"
+                cursor.execute(script)
+                cursor.commit()
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao criar o projeto: {e}")
+            return False
+        
+    def lista_projetos(self, cursor):
+        try:
+            script = """
+            SELECT PROJETO.Cod_Proj, Título, Resumo, Data_inicio, Data_final, Nome_Tipo
+            FROM PROJETO, TIPO_PROJETO
+            WHERE PROJETO.Id_Tipo_Proj = TIPO_PROJETO.Id_Tipo_Proj;
             """
             cursor.execute(script)
-            tipo_projeto_id = cursor.fetchone()
-            if tipo_projeto_id == [[]]:
-                script = f"""
-                INSERT INTO TIPO_PROJETO (Nome_Tipo) VALUES ('{self.tipo_projeto}');
-                SELECT Id_Tipo_Proj FROM TIPO_PROJETO WHERE Nome_Tipo = '{self.tipo_projeto}';
-                """
-                cursor.execute(script)
-                tipo_projeto_id = cursor.fetchone()[0]
-            else:
-                tipo_projeto_id = tipo_projeto_id[0]
-
+            projetos = cursor.fetchall()
+            return projetos
+        except pyodbc.Error as e:
+            print(f"Erro ao buscar projetos: {e}")
+            return None
+        
+    def atualiza_projeto(self, cursor):
+        try:
+            operacao = ""
+            if self.titulo:
+                operacao += f"Título = '{self.titulo}', "
+            if self.resumo:
+                operacao += f"Resumo = '{self.resumo}', "
+            if self.data_inicio:
+                operacao += f"Data_inicio = '{self.data_inicio}', "
+            if self.data_final:
+                operacao += f"Data_final = '{self.data_final}', "
+            if self.id_t_projeto:
+                operacao += f"Id_Tipo_Proj = {self.id_t_projeto}, "
+            
+            operacao = operacao[:-2]  # Remove the last comma and space
+            if not operacao:
+                print("Nenhuma informação para atualizar.")
+                return False
             script = f"""
-            INSERT INTO PROJETO (Id_Tipo_Proj, Título, Resumo, Data_inicio, Data_final)
-            VALUES ('{self.tipo_projeto_id}', '{self.titulo}', '{self.resumo}', '{self.data_inicio}', '{self.data_final}');
+            UPDATE PROJETO
+            SET {operacao}
+            WHERE Cod_Proj = {self.cod_projeto};
             """
             cursor.execute(script)
             cursor.commit()
             return True
         except pyodbc.Error as e:
-            print(f"Erro ao criar o projeto: {e}")
+            print(f"Erro ao atualizar o projeto: {e}")
             return False
+        
+    def deleta_projeto(self, cursor):
+        try:
+            script = f"CALL deletar_projeto('{self.cod_projeto}');"
+            cursor.execute(script)
+            cursor.commit()
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao deletar projeto: {e}")
+            return False
+    
 
 
 

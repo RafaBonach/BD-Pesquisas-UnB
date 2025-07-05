@@ -14,19 +14,22 @@ CREATE TABLE MEMBRO (
 
 /* Projeto tem um tipo */
 CREATE TABLE TIPO_PROJETO (
-  Id_Tipo_Proj  INT          PRIMARY KEY,
-  Nome_Tipo     VARCHAR(20)  NOT NULL
+  Id_Tipo_Proj  INT          GENERATED ALWAYS AS IDENTITY, /*Modifiquei id para serial*/
+  Nome_Tipo     VARCHAR(20)  NOT NULL,
+
+  PRIMARY KEY  (Id_Tipo_Proj) /*Modifiquei a chave primaria*/
 );
 
 CREATE TABLE PROJETO (
-  Cod_Proj        INT          UNIQUE,
-  Id_Tipo_Proj    INT          UNIQUE,
+  Cod_Proj        INT          GENERATED ALWAYS AS IDENTITY,  /*Modifiquei id para serial*/
+  Id_Tipo_Proj    INT,
   Título          VARCHAR(75)  NOT NULL,
   Data_final      DATE         NOT NULL,
   Data_inicio     DATE         NOT NULL,
   Resumo          text,
 
   PRIMARY KEY  (Cod_Proj, Id_Tipo_Proj),
+  UNIQUE	   (Cod_Proj),
   FOREIGN KEY  (Id_Tipo_Proj)    REFERENCES TIPO_PROJETO(Id_Tipo_Proj)
 );
 
@@ -223,3 +226,112 @@ CREATE TABLE Conta (
 
   UNIQUE (Nome, Senha)
 );
+
+
+
+
+
+
+
+
+
+
+/* PROJETO */
+/* Cria Projeto */
+CREATE OR REPLACE PROCEDURE inserir_projeto(
+    p_id_tipo_proj INT,
+    p_titulo VARCHAR(75),
+    p_data_inicio DATE,
+    p_data_final DATE
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO PROJETO (Id_Tipo_Proj, Título, Data_inicio, Data_final)
+    VALUES (p_id_tipo_proj, p_titulo, p_data_inicio, p_data_final);
+END;
+$$;
+
+/* Deleta Projeto */
+CREATE OR REPLACE PROCEDURE deletar_projeto(
+    p_cod_proj INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM PROJETO WHERE Cod_Proj = p_cod_proj;
+EXCEPTION
+    WHEN foreign_key_violation THEN
+        RAISE NOTICE 'Não é possível deletar o projeto com código % porque ele está vinculado a outras tabelas.', p_cod_proj;
+    WHEN others THEN
+        RAISE EXCEPTION 'Erro ao deletar projeto: %', SQLERRM;
+END;
+$$;
+
+/* PROJETO */
+/* Cria Projeto */
+CREATE OR REPLACE PROCEDURE inserir_projeto(
+    p_id_tipo_proj INT,
+    p_titulo VARCHAR(75),
+    p_data_inicio DATE,
+    p_data_final DATE
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO PROJETO (Id_Tipo_Proj, Título, Data_inicio, Data_final)
+    VALUES (p_id_tipo_proj, p_titulo, p_data_inicio, p_data_final);
+END;
+$$;
+
+/* Deleta Projeto */
+CREATE OR REPLACE PROCEDURE deletar_projeto(
+    p_cod_proj INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM PROJETO WHERE Cod_Proj = p_cod_proj;
+EXCEPTION
+    WHEN foreign_key_violation THEN
+        RAISE NOTICE 'Não é possível deletar o projeto com código % porque ele está vinculado a outras tabelas.', p_cod_proj;
+    WHEN others THEN
+        RAISE EXCEPTION 'Erro ao deletar projeto: %', SQLERRM;
+END;
+$$;
+
+
+/* TIPO DE PROJETO */
+/* Cria Tipo de Projeto */
+CREATE OR REPLACE PROCEDURE inserir_tipo_projeto(
+    p_nome_tipo VARCHAR(20)
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO TIPO_PROJETO (Nome_Tipo)
+    VALUES (p_nome_tipo);
+    
+EXCEPTION
+    WHEN unique_violation THEN
+        RAISE NOTICE 'Tipo de projeto com ID % já existe.', p_id_tipo_proj;
+    WHEN others THEN
+        RAISE EXCEPTION 'Erro ao inserir tipo de projeto: %', SQLERRM;
+END;
+$$;
+
+/* Deleta Tipo de Projeto */
+CREATE OR REPLACE PROCEDURE deletar_tipo_projeto(
+    p_id_tipo_proj INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM TIPO_PROJETO WHERE Id_Tipo_Proj = p_id_tipo_proj;
+EXCEPTION
+    WHEN foreign_key_violation THEN
+        RAISE NOTICE 'Não é possível deletar o tipo de projeto com ID % porque ele está vinculado a outros projetos.', p_id_tipo_proj;
+    WHEN others THEN
+        RAISE EXCEPTION 'Erro ao deletar tipo de projeto: %', SQLERRM;
+END;
+$$;

@@ -63,7 +63,7 @@ def create_tables_sql_script(password ,db_name='db_pesquisas', sql_script_path='
             'LINHA_PESQUISA', 'AREA_ATUACAO', 'LOCALIDADE', 'PATRIMONIO',
             'EMAIL', 'ORIGEM', 'ATUA', 'PESQUISA', 'REALIZA', 'POSSUI',
             'VINCULA', 'EXECUTA', 'PARTICIPA', 'CNAE', 'FINANCIA',
-            'FOMENTA', 'EDICAO'
+            'FOMENTA', 'EDICAO', 'CONTA'
         ]
 
         tables_found = [table for table in expected_tables if table in existing_tables]
