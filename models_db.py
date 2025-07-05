@@ -294,6 +294,7 @@ def insert_account(cursor, acc_type, acc_name, acc_password):
 
     except pyodbc.Error as e:
         print(f"Erro na criação de conta!\n{e}")
+        return False
 
 def account_in_db(cursor, acc_name, acc_password):
     try:
@@ -307,7 +308,7 @@ def account_in_db(cursor, acc_name, acc_password):
 
 def get_acc(cursor, acc_name, acc_password):
     try:
-        acc_record = cursor.execute(f"SELECT Id_Conta, Tipo FROM Conta WHERE Nome='{acc_name}' AND Senha='{acc_password}'").fetchall()
+        acc_record = cursor.execute(f"SELECT Id_Conta, Tipo, Nome FROM Conta WHERE Nome='{acc_name}' AND Senha='{acc_password}'").fetchall()
 
         if len(acc_record) == 0:
             return None

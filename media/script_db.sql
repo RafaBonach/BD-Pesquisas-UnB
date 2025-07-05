@@ -216,10 +216,11 @@ CREATE TABLE Edicao (
 /* Contas de usuário do sistema */
 /* Tipo: 0, 1, 2, 3 -> instituiçao, pesquisador, estudante, colaborador externo */
 CREATE TABLE Conta (
-  Id_Conta  SERIAL       PRIMARY KEY,
-  Tipo      INT          NOT NULL,
-  Nome      VARCHAR(15)  NOT NULL,
-  Senha     CHAR(8)      NOT NULL,
+  Id_Conta     SERIAL       PRIMARY KEY,
+  Tipo         INT          NOT NULL,
+  Nome         VARCHAR(15)  NOT NULL,
+  Senha        CHAR(6)      NOT NULL,
+  Id_Entidade  INT,
 
-  UNIQUE (Nome, Senha)
+  UNIQUE (Nome, Senha, Id_Entidade)
 );
