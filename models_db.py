@@ -286,16 +286,18 @@ class Projeto:
 
 def insert_account(cursor, acc_type, acc_name, acc_password):
     try:
+        if account_in_db(cursor, acc_name, acc_password):
+            return False
+
         cursor.execute(f"INSERT INTO Conta (Id_Conta, Tipo, Nome, Senha) VALUES (DEFAULT, {acc_type}, '{acc_name}', '{acc_password}')")
         return True
 
     except pyodbc.Error as e:
         print(f"Erro na criação de conta!\n{e}")
-        return -1
 
 def account_in_db(cursor, acc_name, acc_password):
     try:
-        acc_exists = len(cursor.execute(f"SELECT * FROM Conta WHERE Nome='{acc_name}' AND Senha='{acc_password}'").fetchall()) != 0
+        acc_exists = len(cursor.execute(f"SELECT * FROM Conta WHERE Nome='{acc_name}'").fetchall()) != 0
 
         return acc_exists
 
@@ -315,10 +317,3 @@ def get_acc(cursor, acc_name, acc_password):
     except pyodbc.Error as e:
         print(f"Erro na consulta de conta!\n{e}")
         return None
-
-def delete_acc_records(cursor):
-    try:
-        cursor.execute("DELETE FROM Conta")
-
-    except pyodbc.Error as e:
-        print(f"Erro na deleção de contas!\n{e}")
