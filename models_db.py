@@ -294,11 +294,14 @@ def insert_account(cursor, acc_type, acc_name, acc_password):
 
     except pyodbc.Error as e:
         print(f"Erro na criação de conta!\n{e}")
-        return False
+        return -1
 
-def account_in_db(cursor, acc_name, acc_password):
+def account_in_db(cursor, acc_name=None, acc_id=None):
     try:
-        acc_exists = len(cursor.execute(f"SELECT * FROM Conta WHERE Nome='{acc_name}'").fetchall()) != 0
+        if acc_name:
+            acc_exists = len(cursor.execute(f"SELECT * FROM Conta WHERE Nome='{acc_name}'").fetchall()) != 0
+        else:
+            acc_exists = len(cursor.execute(f"SELECT * FROM Conta WHERE Id_Conta='{acc_id}'").fetchall()) != 0
 
         return acc_exists
 
@@ -307,6 +310,7 @@ def account_in_db(cursor, acc_name, acc_password):
         return -1
 
 def get_acc(cursor, acc_name, acc_password):
+    """retorna o registro da conta (id, tipo, nome)"""
     try:
         acc_record = cursor.execute(f"SELECT Id_Conta, Tipo, Nome FROM Conta WHERE Nome='{acc_name}' AND Senha='{acc_password}'").fetchall()
 
@@ -318,3 +322,72 @@ def get_acc(cursor, acc_name, acc_password):
     except pyodbc.Error as e:
         print(f"Erro na consulta de conta!\n{e}")
         return None
+
+def get_entity_id(cursor, type, name):
+    """retorna o id da entidade
+    
+    type:
+    - 0 Instituição
+    - 1 Membro
+    """
+
+    try:
+        acc_record = cursor.execute(f"SELECT Id_Membro FROM Membro WHERE Nome='{name}'").fetchall()
+
+        if len(acc_record) == 0:
+            return None
+
+        return acc_record[0]
+
+    except pyodbc.Error as e:
+        print(f"Erro na consulta de entidade!\n{e}")
+        return None
+
+def link_acc(cursor, id_acc:int, id_entity):
+    """atualiza Id_Entidade de conta para o ID da entidade relacionada"""
+    
+    try:
+        cursor.execute(f"""
+                       UPDATE Conta
+                       SET Id_Entidade='{id_entity}'
+                       WHERE Id_Conta={id_acc}
+                       """)
+
+        return True
+
+    except pyodbc.Error as e:
+        print(id_acc, id_entity)
+        input(f"Erro ao tentar ligar conta a entidade.\n{e}")
+        return False
+
+
+def link_location(cursor, id_member, id_loc):
+    """atualiza Cod_Postal e Id_Membro de localidade para os IDs da localidade e membro relacionados"""
+    
+    try:
+        cursor.execute(f"""
+                       INSERT INTO Origem (Cod_Postal, Id_Membro)
+                       VALUES ({id_loc}, {id_member})
+                       """)
+
+        return True
+
+    except pyodbc.Error as e:
+        input(f"Erro ao tentar ligar localidade e membro.\n{e}")
+        return False
+
+def check_acc_link():
+    return True
+
+
+def delete_acc(cursor, acc_id):
+    try:
+        if not account_in_db(cursor, acc_id=acc_id):
+            return False
+
+        cursor.execute(f"DELETE FROM Conta WHERE Id_conta='{acc_id}'")
+        return True
+    
+    except pyodbc.Error as e:
+        input(f"Erro ao tentar ligar localidade e membro.\n{e}")
+        return -1

@@ -39,3 +39,13 @@ def print_menu(options=None, title:str=None, description:str=None):
     if options:
         for i in range(len(options)):
             print(f"{i} - {options[i]}")
+
+def check_max_len(string:str, max_len:int, can_be_empty:bool=False):
+    if not can_be_empty:
+        if len(string) == 0:
+            return False
+
+    if len(string) > max_len:
+        return False
+
+    return True
