@@ -10,6 +10,13 @@ class IProject:
     def title(self, action):
         clear()
         projeto = Projeto()
+        localidade = Localidade()
+        linha_pesquisa = LinhaPesquisa()
+        membro = Membro()
+        area_atuacao = AreaAtuacao()
+        congresso = Congresso()
+        instituicao = Instituicao()
+        patrimonio = Patrimonio()
         match action:
             case 'c':
                 print("==========================\n"
@@ -26,6 +33,7 @@ class IProject:
                 projeto.resumo = resumo
                 time.sleep(1)
 
+                # Cria Tipo de Projeto
                 clear()
                 lista_t_proj = projeto.lista_t_projetos(self.cursor)
                 print("Tipos de projeto disponíveis:")
@@ -51,8 +59,237 @@ class IProject:
                     for tp in tipo_proj:
                         if tp[1].upper() == nome_tipo.upper():
                             projeto.id_t_projeto = tp[0]
+                            break
+                
+                self.create_project(projeto)
+                
+                
+                validador = ''
+                validador = input("\n\nDeseja inserir uma localidade no projeto?(S/N): ")
+                if validador.strip().upper() == 'S' or validador.strip().upper() == 'SIM':
                     time.sleep(1)
-                    return projeto
+                    # Cria Localidade do Projeto
+                    clear()
+                    print("==========================\n"
+                        "Localidades disponíveis:\n")
+                    l_localidades = self.list_localidades(localidade)
+                    cod_postal = input("Digite o código postal da localidade do projeto, N para não inserir localidade no projeto\nou selecione qualquer tecla para criar uma nova localidade: ")
+                    if l_localidades != {} and cod_postal.strip() in l_localidades:
+                        localidade.cod_postal = cod_postal.strip()
+                    elif cod_postal.strip().upper() == 'N':
+                        print("\nLocalidade não inserida no projeto.\n")
+                        localidade.cod_postal = None
+                    else:
+                        clear()
+                        print("==========================\n"
+                            "Criador de Localidades\n"
+                            "==========================\n\n"
+                            "\nInsira a informação a baixo\n")
+                        localidade.cod_postal = input("Código postal: ")
+                        localidade.pais = input("País: ")
+                        localidade.uf = input("UF: ")
+                        localidade.cidade = input("Cidade: ")
+                        
+                        if localidade.cod_postal and localidade.pais and localidade.uf and localidade.cidade:
+                            self.create_localidade(localidade)
+                            projeto.localidade = localidade
+                            self.connect_projeto_localidade(projeto)
+                        else:
+                            print("\n\nDados da localidade inválidos. Localidade não criada.")
+                            projeto.localidade = None
+                        
+                        
+                
+                validador = ''
+                validador = input("\n\nDeseja inserir uma linha de pesquisa no projeto?(S/N): ")
+                if validador.strip().upper() == 'S' or validador.strip().upper() == 'SIM':
+                    time.sleep(1)
+                    # Cria Linha de Pesquisa
+                    clear()
+                    print("==========================\n"
+                        "Linhas de pesquisa disponíveis:\n")
+                    l_linha_pesquisa = self.list_linhas_pesquisa(linha_pesquisa)
+                    id_linha_pesquisa = input("Digite o ID da linha de pesquisa do projeto, N para não inserir linha de pesquisa no projeto\nou selecione qualquer tecla para criar uma nova linha de pesquisa: ")
+                    if l_linha_pesquisa != {} and id_linha_pesquisa.isdigit() and int(id_linha_pesquisa) in l_linha_pesquisa:
+                        linha_pesquisa.id_linha = int(id_linha_pesquisa)
+                        projeto.linha_pesquisa = linha_pesquisa
+                    elif id_linha_pesquisa.strip().upper() == 'N':
+                        print("\nLinha de pesquisa não inserida no projeto.\n")
+                        projeto.linha_pesquisa = None
+                    else:
+                        clear()
+                        print("==========================\n"
+                            "Criador de Linhas de Pesquisa\n"
+                            "==========================\n\n"
+                            "\nInsira a informação a baixo\n")
+                        nome_linha = input("Nome da linha de pesquisa: ")
+                        desc_linha = input("Descrição da linha de pesquisa: ")
+                        linha_pesquisa.nome_linha = nome_linha
+                        linha_pesquisa.descricao_linha = desc_linha
+                        
+                        if linha_pesquisa.nome_linha and linha_pesquisa.descricao_linha:
+                            self.create_linha_pesquisa(linha_pesquisa)
+                            projeto.linha_pesquisa = linha_pesquisa
+                            self.connect_projeto_linha_pesquisa(projeto)
+                        else:
+                            print("\n\nDados da linha de pesquisa inválidos. Linha de pesquisa não criada.")
+                            projeto.linha_pesquisa = None
+                    
+                validador = ''
+                validador = input("\n\nDeseja inserir uma area de atuação do projeto?(S/N): ")
+                if validador.strip().upper() == 'S' or validador.strip().upper() == 'SIM':
+                    time.sleep(1)
+                    # Cria Area de Atuação do Projeto
+                    clear()
+                    print("==========================\n"
+                        "Áreas de atuação disponíveis:\n")
+                    l_areas_atuacao = self.list_areas_atuacao(area_atuacao)
+
+                    id_area_atuacao = input("Digite o ID da área de atuação do projeto, N para não inserir área de atuação no projeto\nou selecione qualquer tecla para criar uma nova área de atuação: ")
+
+                    if l_areas_atuacao != {} and id_area_atuacao.isdigit() and int(id_area_atuacao) in l_areas_atuacao:
+                        area_atuacao.id_area = int(id_area_atuacao)
+                        projeto.area_atuacao = area_atuacao
+                    elif id_area_atuacao.strip().upper() == 'N':
+                        print("\nÁrea de atuação não será inserida no projeto.\n")
+                        projeto.area_atuacao = None
+                    else:
+                        clear()
+                        print("==========================\n"
+                            "Criador de Áreas de Atuação\n"
+                            "==========================\n\n"
+                            "\nInsira a informação a baixo\n")
+                        nome_area = input("Nome da área de atuação: ")
+                        abrangencia = input("Abrangência da área de atuação: ")
+                        descricao_area = input("Descrição da área de atuação (opcional): ")
+                        area_atuacao.abrangecia = abrangencia
+                        area_atuacao.nome_area = nome_area
+                        area_atuacao.descricao_area = descricao_area if descricao_area != "" else ""
+
+                        
+                        if area_atuacao.abrangecia and area_atuacao.nome_area:
+                            self.create_area_atuacao(area_atuacao)
+                            projeto.area_atuacao = area_atuacao
+                            self.connect_projeto_area_atuacao(projeto)
+                        else:
+                            print("\n\nDados da área de atuação inválidos. Área de atuação não criada.")
+                            projeto.area_atuacao = None
+
+                validador = ''
+                validador = input("\n\nDeseja inserir um congresso que o projeto participou?(S/N): ")
+                if validador.strip().upper() == 'S' or validador.strip().upper() == 'SIM':
+                    time.sleep(1)
+                    # Cria Congresso do Projeto
+                    clear()
+                    print("==========================\n"
+                        "Congressos disponíveis:\n")
+                    l_congressos = self.list_congressos(congresso)
+
+                    id_congresso = input("Digite o ID do congresso que o projeto participou, N para não inserir congresso no projeto\nou selecione qualquer tecla para criar um novo congresso: ")
+                    if l_congressos != {} and id_congresso.isdigit() and int(id_congresso) in l_congressos:
+                        congresso.id_congresso = int(id_congresso)
+                        projeto.congresso = congresso
+                    elif id_congresso.strip().upper() == 'N':
+                        print("\nCongresso não será inserido no projeto.\n")
+                        projeto.congresso = None
+                    else:
+                        clear()
+                        print("==========================\n"
+                            "Criador de Congressos\n"
+                            "==========================\n\n"
+                            "\nInsira a informação a baixo\n")
+                        nome_congresso = input("Nome do congresso: ")
+                        descricao_congresso = input("Descrição do congresso: ")
+                        objetivo = input("Objetivo do congresso (opcional): ")
+                        congresso.nome_congresso = nome_congresso
+                        congresso.desc_congresso = descricao_congresso
+                        congresso.objetivo = objetivo
+                        
+                        if congresso.nome_congresso and congresso.descricao_congresso:
+                            self.create_congresso(congresso)
+                            projeto.congresso = congresso
+                            self.connect_projeto_congresso(projeto)
+                        else:
+                            print("\n\nDados do congresso inválidos. Congresso não criado.")
+                            projeto.congresso = None
+
+                validador = ''
+                validador = input("\n\nDeseja inserir uma instituição fomentadora do projeto?(S/N): ")
+                if validador.strip().upper() == 'S' or validador.strip().upper() == 'SIM':
+                    time.sleep(1)
+                    # Cria Instituição Fomentadora do Projeto
+                    clear()
+                    print("==========================\n"
+                        "Instituições disponíveis:\n")
+                    l_instituicoes = self.list_instituicoes(instituicao)
+
+                    id_instituicao = input("Digite o ID da instituição fomentadora do projeto ou Precisone qualquer tecla para não inserir instituição: ")
+                    if l_instituicoes != {} and id_instituicao.isdigit() and int(id_instituicao) in l_instituicoes:
+                        instituicao.id_instituicao = int(id_instituicao)
+                        instituicao.tipo_fomento = input("Digite o tipo de fomento desta insitituição: ")
+                        projeto.instituicao_fomentadora = instituicao
+                        self.connect_projeto_instituicao_fomentadora(projeto)
+                    else:
+                        print("\nInstituição fomentadora não será inserida no projeto.\n")
+                        projeto.instituicao_fomentadora = None
+                    
+                validador = ''
+                validador = input("\n\nDeseja inserir uma instituição financiadora do projeto?(S/N): ")
+                if validador.strip().upper() == 'S' or validador.strip().upper() == 'SIM':
+                    time.sleep(1)
+                    # Cria Instituição Financiadora do Projeto
+                    clear()
+                    print("==========================\n"
+                        "Instituições disponíveis:\n")
+                    l_instituicoes = self.list_instituicoes(instituicao)
+
+                    id_instituicao = input("Digite o ID da instituição financiadora do projeto ou Precisone qualquer tecla para não inserir instituição: ")
+                    if l_instituicoes != {} and id_instituicao.isdigit() and int(id_instituicao) in l_instituicoes:
+                        instituicao.id_instituicao = int(id_instituicao)
+                        projeto.instituicao_financeira = instituicao
+                        self.connect_projeto_instituicao_financeira(projeto)
+                    else:
+                        print("\nInstituição financiadora não será inserida no projeto.\n")
+                        projeto.instituicao_financeira = None
+
+                validador = ''
+                validador = input("\n\nDeseja inserir um patrimônio do projeto?(S/N): ")
+                if validador.strip().upper() == 'S' or validador.strip().upper() == 'SIM':
+                    time.sleep(1)
+                    # Cria Patrimônio do Projeto
+                    clear()
+                    print("==========================\n"
+                        "Patrimônios disponíveis:\n")
+                    l_patrimonios = self.list_patrimonios(patrimonio)
+
+                    id_patrimonio = input("Digite o ID do patrimônio do projeto, N para não inserir patrimônio no projeto\nou selecione qualquer tecla para criar um novo patrimônio: ")
+                    if l_patrimonios != {} and id_patrimonio.isdigit() and int(id_patrimonio) in l_patrimonios:
+                        patrimonio.id_patrimonio = int(id_patrimonio)
+                        projeto.patrimonio = patrimonio
+                    elif id_patrimonio.strip().upper() == 'N':
+                        print("\nPatrimônio não será inserido no projeto.\n")
+                        projeto.patrimonio = None
+                    else:
+                        clear()
+                        print("==========================\n"
+                            "Criador de Patrimônios\n"
+                            "==========================\n\n"
+                            "\nInsira a informação a baixo\n")
+                        nome_patrimonio = input("Nome do patrimônio: ")
+                        custo_patrimonio = input("Custo do patrimônio: ")
+                        especificacao_patrimonio = input("Especificação do patrimônio (opcional): ")
+                        patrimonio.nome_patrimonio = nome_patrimonio
+                        patrimonio.custo_patrimonio = custo_patrimonio
+                        patrimonio.especificacao_patrimonio = especificacao_patrimonio
+                        
+                        if patrimonio.nome_patrimonio and patrimonio.custo_patrimonio:
+                            projeto.patrimonio = patrimonio
+                            self.connect_projeto_patrimonio(projeto)
+                        else:
+                            print("\n\nDados do patrimônio inválidos. Patrimônio não criado.")
+                            projeto.patrimonio = None
+                    
+                return projeto
                 
                 """
 ==============================================================================================
@@ -173,6 +410,12 @@ class IProject:
                     break
 
             if projeto.cria_projeto(self.cursor):
+                l_projetos = projeto.busca_projeto(self.cursor)
+                if not l_projetos:
+                    print("\n\nNenhum projeto criado até o momento")
+                    return
+                projeto.cod_projeto = l_projetos[0][0]  # Pega o ID do projeto criado
+
                 print(f"\n\nProjeto '{projeto.titulo}' criado com sucesso!")
             else:
                 print("\n\nErro ao criar o projeto.")
@@ -181,10 +424,12 @@ class IProject:
 
     def list_projects(self, projeto):
         lista_projetos = projeto.lista_projetos(self.cursor)
+        l_projetos = {}
         if not lista_projetos:
             print("Nenhum projeto encontrado.")
         else:
             for proj in lista_projetos:
+                l_projetos[proj[0]] = (proj[1], proj[2], proj[3], proj[4], proj[5])
                 resumo = proj[2] if proj[2] else "N/A"
                 print(f"==========================\n")
                 print(f"ID:                             {proj[0]}\n"
@@ -194,6 +439,7 @@ class IProject:
                         f"Data de Fim do projeto:       {proj[4]}\n"
                         f"Tipo de projeto:              {proj[5]}")
                 print(f"\n==========================\n\n")
+        return l_projetos
 
     def update_project(self, projeto):
         if isinstance(projeto, Projeto):
@@ -214,6 +460,227 @@ class IProject:
             print("\n\nDados do projeto inválidos.")
         
     
+    def connect_projeto_localidade(self,projeto):
+        # Insere a localidade do projeto, se houver
+        if projeto.localidade:
+            if not projeto.insere_localidade(self.cursor):
+                print("\n\nErro ao inserir localidade no projeto.")
+                return
+            
+    def connect_projeto_linha_pesquisa(self, projeto):
+        # Insere a linha de pesquisa do projeto, se houver
+        if projeto.linha_pesquisa:
+            if not projeto.insere_linha_pesquisa(self.cursor):
+                print("\n\nErro ao inserir linha de pesquisa no projeto.")
+                return
+    
+    def connect_projeto_area_atuacao(self, projeto):
+        # Insere area de atuação do projeto, se houver
+        if projeto.area_atuacao:
+            if not projeto.insere_area_atuacao(self.cursor):
+                print("\n\nErro ao inserir área de atuação no projeto.")
+                return
+                
+    
+    def connect_projeto_congresso(self, projeto):
+        # Insere Congresso que o projeto tenha participado, se houver
+        if projeto.congresso:
+            if not projeto.insere_congresso(self.cursor):
+                print("\n\nErro ao inserir congresso no projeto.")
+                return
+    
+    def connect_projeto_instituicao_fomentadora(self, projeto):
+        # Insere Instituição fomentadora do projeto, se houver
+        if projeto.instituicao_fomentadora:
+            if not projeto.insere_instituicao_fomentadora(self.cursor):
+                print("\n\nErro ao inserir instituição fomentadora no projeto.")
+                return
+    
+    def connect_projeto_instituicao_financeira(self, projeto):
+        # Insere instituição financiadora do projeto, se houver
+        if projeto.instituicao_financeira:
+            if not projeto.insere_instituicao_financeira(self.cursor):
+                print("\n\nErro ao inserir instituição financiadora no projeto.")
+                return
+    
+    def connect_projeto_patrimonio(self, projeto):
+        # Insere Patrimonio do projeto, se houver
+        if projeto.patrimonio:
+            if not projeto.insere_patrimonio(self.cursor):
+                print("\n\nErro ao inserir patrimônio no projeto.")
+                return
+
+
+    
+    def create_localidade(self, localidade):
+        if isinstance(localidade, Localidade):
+            if localidade.criar_localidade(self.cursor):
+                print(f"\n\nLocalidade '{localidade.cidade}' criada com sucesso!")
+            else:
+                print("\n\nErro ao criar a localidade.")
+        else:
+            print("\n\nDados da localidade inválidos.")
+
+    def list_localidades(self, localidade):
+        lista_localidades = localidade.lista_localidades(self.cursor)
+        if not lista_localidades:
+            print("Nenhuma localidade encontrada.")
+            return {}
+        else:
+            l_localidades = {}
+            for loc in lista_localidades:
+                l_localidades[loc[0]] = (loc[1], loc[2], loc[3])
+                print(f"==========================\n")
+                print(f"Código Postal: {loc[0]}\n"
+                      f"País:          {loc[1]}\n"
+                      f"UF:           {loc[2]}\n"
+                      f"Cidade:       {loc[3]}")
+                print(f"\n==========================\n\n")
+            return l_localidades
+
+    def create_linha_pesquisa(self, l_pesquisa):
+        if isinstance(l_pesquisa, LinhaPesquisa):
+            if l_pesquisa.criar_linha_pesquisa(self.cursor):
+                print(f"\n\nLinha de pesquisa '{l_pesquisa.nome_linha_pesquisa}' criada com sucesso!")
+            else:
+                print("\n\nErro ao criar a linha de pesquisa.")
+        else:
+            print("\n\nDados da linha de pesquisa inválidos.")
+
+    def list_linhas_pesquisa(self, l_pesquisa):
+        lista_linhas_pesquisa = l_pesquisa.lista_l_pesquisa(self.cursor)
+        if not lista_linhas_pesquisa:
+            print("Nenhuma linha de pesquisa encontrada.")
+            return {}
+        else:
+            l_linhas_pesquisa = {}
+            for lp in lista_linhas_pesquisa:
+                l_linhas_pesquisa[lp[0]] = (lp[1], lp[2])
+                print(f"==========================\n")
+                print(f"ID: {lp[0]}\n"
+                      f"Nome: {lp[1]}\n"
+                      f"Descrição: {lp[2]}")
+                print(f"\n==========================\n\n")
+            return l_linhas_pesquisa
+
+    def list_membros(self, membro, tipo_membro=""):
+        lista_membros = membro.lista_membros(self.cursor, tipo_membro)
+        if not lista_membros:
+            print("Nenhum membro encontrado.")
+            return {}
+        else:
+            l_membros = {}
+            for m in lista_membros:
+                l_membros[m[0]] = (m[1], m[2], m[3])
+                print(f"==========================\n")
+                print(f"ID: {m[0]}\n"
+                      f"Nome: {m[1]}\n"
+                      f"Tipo: {m[2]}\n"
+                      f"Descricao: {m[3]}\n")
+                if tipo_membro == 'pesquisador':
+                    print(f"Departamento: {m[4]}")
+                    l_membros[m[0]] = (m[1], m[2], m[3], m[4])
+                elif tipo_membro == 'estudante':
+                    print(f"Matricula: {m[4]}\n"
+                          f"Curso: {m[5]}")
+                    l_membros[m[0]] = (m[1], m[2], m[3], m[4], m[5])
+                print(f"\n==========================\n\n")
+            return l_membros
+
+    def create_area_atuacao(self, area_atuacao):
+        if isinstance(area_atuacao, AreaAtuacao):
+            if area_atuacao.criar_area_atuacao(self.cursor):
+                print(f"\n\nÁrea de atuação '{area_atuacao.nome_area_atuacao}' criada com sucesso!")
+            else:
+                print("\n\nErro ao criar a área de atuação.")
+        else:
+            print("\n\nDados da área de atuação inválidos.")
+    
+    def list_areas_atuacao(self, area_atuacao):
+        lista_areas_atuacao = area_atuacao.lista_areas_atuacao(self.cursor)
+        if not lista_areas_atuacao:
+            print("Nenhuma área de atuação encontrada.")
+            return {}
+        else:
+            l_areas_atuacao = {}
+            for aa in lista_areas_atuacao:
+                l_areas_atuacao[aa[0]] = (aa[1], aa[2])
+                print(f"==========================\n")
+                print(f"ID: {aa[0]}\n"
+                      f"Abrangência: {aa[1]}\n"
+                      f"Nome: {aa[2]}")
+                print(f"\n==========================\n\n")
+        return l_areas_atuacao
+    
+    def create_congresso(self, congresso):
+        if isinstance(congresso, Congresso):
+            if congresso.criar_congresso(self.cursor):
+                print(f"\n\nCongresso '{congresso.nome_congresso}' criado com sucesso!")
+            else:
+                print("\n\nErro ao criar o congresso.")
+        else:
+            print("\n\nDados do congresso inválidos.")
+
+    def list_congressos(self, congresso):
+        lista_congressos = congresso.lista_congressos(self.cursor)
+        if not lista_congressos:
+            print("Nenhum congresso encontrado.")
+            return {}
+        else:
+            l_congressos = {}
+            for c in lista_congressos:
+                l_congressos[c[0]] = (c[1], c[2])
+                print(f"==========================\n")
+                print(f"ID: {c[0]}\n"
+                      f"Nome: {c[1]}\n"
+                      f"Descrição: {c[2]}")
+                print(f"\n==========================\n\n")
+        return l_congressos
+    
+    def list_instituicoes(self, instituicao):
+        lista_instituicoes = instituicao.lista_instituicoes(self.cursor)
+        if not lista_instituicoes:
+            print("Nenhuma instituição encontrada.")
+            return {}
+        else:
+            l_instituicoes = {}
+            for inst in lista_instituicoes:
+                l_instituicoes[inst[0]] = (inst[1], inst[2], inst[3])
+                print(f"==========================\n")
+                print(f"ID: {inst[0]}\n"
+                      f"Nome: {inst[1]}\n"
+                      f"Sigla: {inst[2]}\n"
+                      f"CNPJ: {inst[3]}")
+                print(f"\n==========================\n\n")
+        return l_instituicoes
+    
+    def create_patrimonio(self, patrimonio):
+        if isinstance(patrimonio, Patrimonio):
+            if patrimonio.criar_patrimonio(self.cursor):
+                print(f"\n\nPatrimônio '{patrimonio.nome_patrimonio}' criado com sucesso!")
+            else:
+                print("\n\nErro ao criar o patrimônio.")
+        else:
+            print("\n\nDados do patrimônio inválidos.")
+
+    def list_patrimonios(self, patrimonio):
+        lista_patrimonios = patrimonio.lista_patrimonios(self.cursor)
+        if not lista_patrimonios:
+            print("Nenhum patrimônio encontrado.")
+            return {}
+        else:
+            l_patrimonios = {}
+            for pat in lista_patrimonios:
+                l_patrimonios[pat[0]] = (pat[1], pat[2], pat[3], pat[4])
+                print(f"==========================\n")
+                print(f"ID: {pat[0]}\n"
+                      f"Nome: {pat[1]}\n"
+                      f"Custo: {pat[2]}\n"
+                      f"Especificação: {pat[3]}")
+                print(f"\n==========================\n\n")
+        return l_patrimonios
+    
+
     def run(self):
         clear()
         print("\n==========================\n"
@@ -229,7 +696,6 @@ class IProject:
             return
         elif choice == 1:
             data_project = self.title('c')
-            self.create_project(data_project)
         elif choice == 2:
             project = self.title('l')
             self.list_projects(project)

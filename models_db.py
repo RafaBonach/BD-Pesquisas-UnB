@@ -288,7 +288,7 @@ class Pesquisa_instituicao:
         
 
 class Projeto:
-    def __init__(self, cod_projeto="", titulo="", resumo="", data_inicio="", data_final="", id_t_projeto="",tipo_projeto="", linha_pesquisa="", area_atuacao=""):
+    def __init__(self, cod_projeto="", titulo="", resumo="", data_inicio="", data_final="", id_t_projeto="",tipo_projeto="", localidade=None, linha_pesquisa=None, membro=None, area_atuacao=None, congresso=None, instituicao_financeira=None, instituicao_fomentadora=None, patrimonio=None):
         # info projeto
         self.cod_projeto = cod_projeto
         self.titulo = titulo
@@ -301,33 +301,28 @@ class Projeto:
         self.nome_tipo_projeto = tipo_projeto
 
         # info localizacao
-        self.cod_postal = ""
+        self.localidade = localidade
 
         # info linha pesquisa
-        self.nome_linha_pesquisa = linha_pesquisa
-        self.desc_linha_pesquisa = ""
+        self.linha_pesquisa = linha_pesquisa
 
         # info membro
-        self.id_membro = ""
+        self.membro = membro
 
         # info area atuacao
-        self.nome_area_atuacao = area_atuacao
+        self.area_atuacao = area_atuacao
 
         # info congresso
-        self.nome_congresso = ""
-        self.desc_congresso = ""
-        self.cod_edicao_congresso = ""
+        self.congresso = congresso
 
-        # info instituicao
-        self.nome_instituicao = ""
-        self.sigla_instituicao = ""
-        self.cnpj_instituicao = ""
+        # info instituicao financeira
+        self.instituicao_financeira = instituicao_financeira
+
+        #instituicao fomentadora
+        self.instituicao_fomentadora = instituicao_fomentadora
 
         # info patrimonio
-        self.id_patrimonio = ""
-        self.nome_patrimonio = ""
-        self.custo_patrimonio = ""
-        self.especificacao_patrimonio = ""
+        self.patrimonio = patrimonio
 
     """
     ====================================================================================
@@ -408,6 +403,26 @@ class Projeto:
         except pyodbc.Error as e:
             print(f"Erro ao buscar projetos: {e}")
             return None
+    
+    def busca_projeto(self, cursor):
+        try:
+            if self.cod_projeto:
+                script = f"SELECT * FROM PROJETO WHERE Cod_Proj = {self.cod_projeto};"
+                cursor.execute(script)
+                projeto = cursor.fetchone()
+                return projeto
+            elif self.titulo:
+                script = f"SELECT * FROM PROJETO WHERE Título LIKE '%{self.titulo}%';"
+                cursor.execute(script)
+                projeto = cursor.fetchall()
+                return projeto
+            else:
+                print("Código do projeto não fornecido.")
+                return None
+        except pyodbc.Error as e:
+            print(f"Erro ao buscar o projeto: {e}")
+            return None
+
         
     def atualiza_projeto(self, cursor):
         try:
@@ -448,9 +463,304 @@ class Projeto:
         except pyodbc.Error as e:
             print(f"Erro ao deletar projeto: {e}")
             return False
+        
+    def insere_localidade(self, cursor):
+        if not self.localidade:
+            print("Localidade não definida.")
+            return False
+        try:
+            script = f"CALL vincular_projeto_localidade({self.cod_projeto, self.localidade.cod_postal});"
+            cursor.execute(script)
+            cursor.commit()
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao inserir localidade: {e}")
+            return False
+        
+    def insere_linha_pesquisa(self, cursor):
+        if not self.linha_pesquisa:
+            print("Linha de pesquisa não definida.")
+            return False
+        try:
+            script = f"CALL vincular_projeto_linha_pesquisa({self.cod_projeto}, {self.linha_pesquisa.id_linha});"
+            cursor.execute(script)
+            cursor.commit()
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao inserir linha de pesquisa: {e}")
+            return False
     
+    def insere_area_atuacao(self, cursor):
+        if not self.area_atuacao:
+            print("Área de atuação não definida.")
+            return False
+        try:
+            script = f"CALL vincular_projeto_area_atuacao({self.cod_projeto}, {self.area_atuacao.id_area});"
+            cursor.execute(script)
+            cursor.commit()
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao inserir área de atuação: {e}")
+            return False
+
+    def insere_congresso(self, cursor):
+        if not self.congresso:
+            print("Congresso não definido.")
+            return False
+        try:
+            script = f"CALL vincular_projeto_congresso({self.cod_projeto}, {self.congresso.id_congresso}, {self.congresso.objetivo});"
+            cursor.execute(script)
+            cursor.commit()
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao inserir congresso: {e}")
+            return False
+        
+    def insere_instituicao_fomentadora(self, cursor):
+        if not self.instituicao:
+            print("Instituição não definida.")
+            return False
+        try:
+            script = f"CALL instituicao_fomenta_projeto({self.instituicao.cnpj}, {self.cod_projeto}, '{self.instituicao.tipo_fomento}');"
+            cursor.execute(script)
+            cursor.commit()
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao inserir instituição: {e}")
+            return False
+        
+    def insere_instituicao_financeira(self, cursor):
+        if not self.instituicao_financeira:
+            print("Instituição financeira não definida.")
+            return False
+        try:
+            script = f"CALL instituicao_financia_projeto({self.instituicao.cnpj}, {self.cod_projeto});"
+            cursor.execute(script)
+            cursor.commit()
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao inserir instituição financeira: {e}")
+            return False
+        
+    def insere_patrimonio(self, cursor):
+        if not self.patrimonio:
+            print("Patrimônio não definido.")
+            return False
+        try:
+            script = f"CALL inserir_patrimonio({self.cod_projeto}, '{self.patrimonio.nome_patrimonio}', {self.patrimonio.custo_patrimonio}, '{self.patrimonio.especificacao_patrimonio}');"
+            cursor.execute(script)
+            cursor.commit()
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao inserir patrimônio: {e}")
+            return False
+
+class Localidade:
+    def __init__(self, cod_postal="", pais="", uf="", cidade=""):
+        self.cod_postal = cod_postal
+        self.pais = pais
+        self.uf = uf
+        self.cidade = cidade
+
+    def criar_localidade(self, cursor):
+        try:
+            if not self.cod_postal or not self.pais or not self.uf or not self.cidade:
+                print("Todos os campos devem ser preenchidos para criar uma localidade.")
+                return False
+            script = f"CALL inserir_localidade('{self.cod_postal}', '{self.pais}', '{self.uf}', '{self.cidade}');"
+            cursor.execute(script)
+            cursor.commit()
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao criar localidade: {e}")
+            return False
+
+    def lista_localidades(self, cursor):
+        try:
+            script = "SELECT * FROM LOCALIDADE;"
+            cursor.execute(script)
+            localidades = cursor.fetchall()
+            return localidades
+        except pyodbc.Error as e:
+            print(f"Erro ao buscar localidades: {e}")
+            return None
+
+class LinhaPesquisa:
+    def __init__(self, id_linha="", nome_linha="", descricao_linha=""):
+        self.id_linha = id_linha
+        self.nome_linha = nome_linha
+        self.descricao_linha = descricao_linha
+
+    def criar_linha_pesquisa(self, cursor):
+        try:
+            script = f"CALL inserir_linha_pesquisa('{self.nome_linha}', '{self.descricao_linha}');"
+            cursor.execute(script)
+            cursor.commit()
+
+            script = f"SELECT Id_Linha_Pesquisa FROM LINHA_PESQUISA WHERE Nome = '{self.nome_linha}';"
+            cursor.execute(script)
+            linha_pesquisa = cursor.fetchone()
+            if linha_pesquisa:
+                self.id_linha = linha_pesquisa[0][0]
+            else:
+                print("Linha de pesquisa não encontrada após criação.")
+                return False
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao criar linha de pesquisa: {e}")
+            return False
+
+    def lista_linhas_pesquisa(self, cursor):
+        try:
+            script = "SELECT * FROM LINHA_PESQUISA;"
+            cursor.execute(script)
+            linhas_pesquisa = cursor.fetchall()
+            return linhas_pesquisa
+        except pyodbc.Error as e:
+            print(f"Erro ao buscar linhas de pesquisa: {e}")
+            return None      
 
 
+class Membro:
+    def __init__(self, id_pesquisador="", funcao=""):
+        self.id_pesquisador = id_pesquisador
+        self.funcao = funcao
+
+    def lista_membro(self, cursor, tipo_membro):
+        try:
+            if tipo_membro == "pesquisador":
+                
+                script = "SELECT * FROM MEMBRO WHERE Departamento IS NOT NULL;"
+                cursor.execute(script)
+                pesquisadores = cursor.fetchall()
+                return pesquisadores
+                
+            elif tipo_membro == "estudante":
+
+                script = "SELECT * FROM MEMBRO WHERE Matrícula IS NOT NULL;"
+                cursor.execute(script)
+                estudantes = cursor.fetchall()
+                return estudantes
+            
+            else:
+
+                script = "SELECT * FROM MEMBRO WHERE Matrícula IS NULL AND Departamento IS NULL;"
+                cursor.execute(script)
+                membros = cursor.fetchall()
+                return membros
+            
+        except pyodbc.Error as e:
+            print(f"Erro ao buscar membro: {e}")
+            return None
+        
+class AreaAtuacao:
+    def __init__(self, id_area="", abrangecia="", nome_area="", descricao_area=""):
+        self.id_area = id_area
+        self.abrangecia = abrangecia
+        self.nome_area = nome_area
+        self.descricao_area = descricao_area
+
+    def criar_area_atuacao(self, cursor):
+        try:
+            script = f"CALL inserir_area_atuacao('{self.nome_area}', '{self.abrangecia}', '{self.descricao_area}');"
+            cursor.execute(script)
+            cursor.commit()
+
+            script = f"SELECT Id_Area_Atuacao FROM AREA_ATUACAO WHERE Nome = '{self.nome_area}';"
+            cursor.execute(script)
+            area_atuacao = cursor.fetchone()
+            if area_atuacao:
+                self.id_area = area_atuacao[0][0]
+            else:
+                print("Área de atuação não encontrada após criação.")
+                return False
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao criar área de atuação: {e}")
+            return False
+
+    def lista_areas_atuacao(self, cursor):
+        try:
+            script = "SELECT * FROM AREA_ATUACAO;"
+            cursor.execute(script)
+            areas_atuacao = cursor.fetchall()
+            return areas_atuacao
+        except pyodbc.Error as e:
+            print(f"Erro ao buscar áreas de atuação: {e}")
+            return None
+
+class Congresso:
+    def __init__(self, id_congresso="", nome_congresso="", desc_congresso="", objetivo=""):
+        self.id_congresso = id_congresso
+        self.nome_congresso = nome_congresso
+        self.desc_congresso = desc_congresso
+        self.objetivo = objetivo
+
+    def criar_congresso(self, cursor):
+        try:
+            script = f"CALL inserir_congresso('{self.nome_congresso}', '{self.desc_congresso}');"
+            cursor.execute(script)
+            cursor.commit()
+
+            script = f"SELECT Id_Congresso FROM CONGRESSO WHERE Nome = '{self.nome_congresso}';"
+            cursor.execute(script)
+            congresso = cursor.fetchone()
+            if congresso:
+                self.id_congresso = congresso[0][0]
+            else:
+                print("Congresso não encontrado após criação.")
+                return False
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao criar congresso: {e}")
+            return False
+
+    def lista_congressos(self, cursor):
+        try:
+            script = "SELECT * FROM CONGRESSO;"
+            cursor.execute(script)
+            congressos = cursor.fetchall()
+            return congressos
+        except pyodbc.Error as e:
+            print(f"Erro ao buscar congressos: {e}")
+            return None
+        
+class Instituicao:
+    def __init__(self, cnpj="", tipo_fomento=""):
+        self.cnpj = cnpj
+        self.tipo_fomento = tipo_fomento
+
+    def lista_instituicoes(self, cursor):
+        categoria = categoria.upper()
+        try:
+            
+            script = "SELECT * FROM INSTITUICAO;"
+            cursor.execute(script)
+            instituicoes = cursor.fetchall()
+            return instituicoes
+        
+        except pyodbc.Error as e:
+            print(f"Erro ao buscar instituições: {e}")
+            return None
+        
+class Patrimonio:
+    def __init__(self, id_patrimonio="", nome_patrimonio="", custo_patrimonio="", especificacao_patrimonio=""):
+        self.id_patrimonio = id_patrimonio
+        self.nome_patrimonio = nome_patrimonio
+        self.custo_patrimonio = custo_patrimonio
+        self.especificacao_patrimonio = especificacao_patrimonio
+
+    def lista_patrimonios(self, cursor):
+        try:
+            script = "SELECT * FROM PATRIMONIO;"
+            cursor.execute(script)
+            patrimonios = cursor.fetchall()
+            return patrimonios
+        except pyodbc.Error as e:
+            print(f"Erro ao buscar patrimônios: {e}")
+            return None
+        
+    
 
 def insert_account(cursor, acc_type, acc_name, acc_password):
     try:
