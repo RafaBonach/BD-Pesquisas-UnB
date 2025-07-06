@@ -90,6 +90,54 @@ def create_tables_sql_script(password ,db_name='db_pesquisas', sql_script_path='
     except pyodbc.Error as e:
         print("Erro ao criar tabelas:", e)
 
+def create_procedures_sql_script(password, db_name='db_pesquisas', sql_script_path='media/script_procedure.sql'):
+    try:
+        conexao = connect_to_database(db_name, password=password)
+        if isinstance(conexao, Exception):
+            return None
+        
+        cursor = conexao.cursor()
+
+        cursor.execute("""
+            SELECT routine_name
+            FROM information_schema.routines 
+            WHERE routine_schema = 'public'
+            AND routine_type = 'PROCEDURE'
+                       """)
+        
+        existing_procedures = [row[0].upper() for row in cursor.fetchall()]
+
+        expected_procedures = ['inserir_projeto', 'deletar_projeto', 'inserir_tipo_projeto',
+                               'deletar_tipo_projeto', 'inserir_localidade', 'vincular_projeto_localidade',
+                               'inserir_linha_pesquisa', 'vincular_projeto_linha_pesquisa', 'inserir_area_atuacao',
+                               'vincular_projeto_area_atuacao', 'inserir_congresso', 'vincular_projeto_congresso',
+                               'instituicao_fomenta_projeto', 'instituicao_financia_projeto', 'inserir_patrimonio',
+                               'vincular_pesquisador_projeto', 'vincular_estudante_projeto']
+        
+        procedures_found = [proc for proc in expected_procedures if proc in existing_procedures]
+
+        if len(procedures_found) == len(expected_procedures):
+            return True
+        elif len(procedures_found) > 0:
+            for proc in reversed(expected_procedures):
+                if proc in existing_procedures:
+                    try:
+                        cursor.execute(f"DROP PROCEDURE IF EXISTS {proc} CASCADE")
+                        print(f"   - Procedimento {proc} removido")
+                    except pyodbc.Error as e:
+                        print(f"   ⚠️  Erro ao remover {proc}: {e}")
+            conexao.commit()
+
+        with open(sql_script_path, 'r', encoding='utf-8') as file:
+            script = file.read()
+        
+        cursor.execute(script)
+        conexao.commit()
+        print("Procedimentos criados com sucesso!")
+        conexao.close()
+    except pyodbc.Error as e:
+        print("Erro ao criar procedimentos:", e)
+
 if __name__ == "__main__":
     # Exemplo de uso
     password = input("Digite a senha do banco de dados: ")

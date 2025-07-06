@@ -68,7 +68,7 @@ def i_titulo(tipo_pesquisa, id=""):
             return [id, nome_estudante, titulacao, descricao, matricula, curso_estudante]
 
 def i_resultado(tipo_pesquisa, resultado):
-    clear()
+    # clear()
     if resultado is not None:
         if tipo_pesquisa[-1] == 'd':
             match(tipo_pesquisa):
@@ -114,23 +114,34 @@ def i_resultado(tipo_pesquisa, resultado):
                 case "pro":
                     print("Projetos encontrados:\n")
                     print("\n==========================\n\n")
-                    for p in resultado:
-                        print(
-                            f"Nome:                         {p[0]}\n"
-                            f"Resumo:                       {p[1]}\n"
-                            f"Data de início:               {p[2]}\n"
-                            f"Data de término:              {p[3]}\n"
-                            f"Tipo de projeto:              {p[4]}\n"
-                            f"Membros envolvidos:"
-                            f"      {p[5]}\n"
-                            f"Instituição fomentadora:      {p[6]}\n"
-                            f"Linha de pesquisa:            {p[7]}\n"
-                            f"Área de atuação:              {p[8]}\n"
-                            f"Congressos que participou:    {p[9]}\n"
-                        )
-                        print("\n\n==========================\n")
-                        time.sleep(1)
-                    print("\n\nTotal de projetos encontrados: ", len(resultado[0]))
+                    if not resultado:
+                        for p in resultado:
+                            if p[0] is not None:
+                                print(f"Nome:                         {p[0]}\n")
+                            if p[1] is not None:
+                                print(f"Resumo:                       {p[1]}\n")
+                            if p[2] is not None:
+                                print(f"Data de início:               {p[2]}\n")
+                            if p[3] is not None:
+                                print(f"Data de término:              {p[3]}\n")
+                            if p[4] is not None:
+                                print(f"Tipo de projeto:              {p[4]}\n")
+                            if p[5] is not None:
+                                print("Membros envolvidos:"
+                                    f"{p[5]}\n\n")
+                            if p[6] is not None:
+                                print(f"Instituição fomentadora:      {p[6]}\n")
+                            if p[7] is not None:
+                                print(f"Linha de pesquisa:            {p[7]}\n")
+                            if p[8] is not None:
+                                print(f"Área de atuação:              {p[8]}\n")
+                            if p[9] is not None:
+                                print(f"Congressos que participou:    {p[9]}\n")
+                            print("\n\n==========================\n")
+                            time.sleep(1)
+                        print("\n\nTotal de projetos encontrados: ", len(resultado[0]))
+                    else:
+                        print("Nenhum projeto encontrado com os critérios informados.")
                 
                 case "pesq":
                     print("\n\nPesquisadores encontrados:")

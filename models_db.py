@@ -20,7 +20,7 @@ class Pesquisa_projeto:
             operacao += f"PROJETO.Cod_Proj = {self.id} AND "
 
         if self.projeto != "":
-            operacao += f"titulo LIKE '%{self.projeto}%' AND "
+            operacao += f"Título LIKE '%{self.projeto}%' AND "
         
         if self.nome_instituicao != "":
             operacao += f"INSTITUICAO.Nome LIKE '%{self.nome_instituicao}%' AND "
@@ -53,8 +53,8 @@ class Pesquisa_projeto:
                         (PROJETO.Cod_Proj = Executa.Cod_Proj AND Executa.Id_Linha_Pesquisa = LINHA_PESQUISA.Id_Linha_Pesquisa) AND 
                         (CONGRESSO.Id_Congresso = Participa.Id_Congresso AND Participa.Id_Proj = PROJETO.Cod_Proj) AND
                         {operacao}
-                group by titulo, Resumo, Data_inicio, Data_final
-                order by titulo;"""
+                group by PROJETO.Cod_Proj, Título, PROJETO.Resumo, Data_inicio, Data_final
+                order by Título;"""
             
         else:
             script = f"""
@@ -68,7 +68,7 @@ class Pesquisa_projeto:
                         (PROJETO.Id_Tipo_Proj = TIPO_PROJETO.Id_Tipo_Proj) AND 
                         (PROJETO.Cod_Proj = Executa.Cod_Proj AND Executa.Id_Linha_Pesquisa = LINHA_PESQUISA.Id_Linha_Pesquisa) AND 
                         (CONGRESSO.Id_Congresso = Participa.Id_Congresso AND Participa.Id_Proj = PROJETO.Cod_Proj)
-                group by titulo, Resumo, Data_inicio, Data_final
+                group by PROJETO.Cod_Proj, Título, PROJETO.Resumo, Data_inicio, Data_final
                 order by titulo;"""
 
         try:
@@ -288,7 +288,7 @@ class Pesquisa_instituicao:
         
 
 class Projeto:
-    def __init__(self, cod_projeto="", titulo="", resumo="", data_inicio="", data_final="", id_t_projeto="",tipo_projeto="", localidade=None, linha_pesquisa=None, membro=None, area_atuacao=None, congresso=None, instituicao_financeira=None, instituicao_fomentadora=None, patrimonio=None):
+    def __init__(self, cod_projeto="", titulo="", resumo="", data_inicio="", data_final="", id_t_projeto="",tipo_projeto="", localidade=None, linha_pesquisa=None, membro=None, area_atuacao=None, congresso=None, instituicao=None, patrimonio=None):
         # info projeto
         self.cod_projeto = cod_projeto
         self.titulo = titulo
@@ -316,10 +316,7 @@ class Projeto:
         self.congresso = congresso
 
         # info instituicao financeira
-        self.instituicao_financeira = instituicao_financeira
-
-        #instituicao fomentadora
-        self.instituicao_fomentadora = instituicao_fomentadora
+        self.instituicao = instituicao
 
         # info patrimonio
         self.patrimonio = patrimonio
@@ -456,7 +453,7 @@ class Projeto:
         
     def deleta_projeto(self, cursor):
         try:
-            script = f"CALL deletar_projeto('{self.cod_projeto}');"
+            script = f"CALL deletar_projeto({self.cod_projeto});"
             cursor.execute(script)
             cursor.commit()
             return True
@@ -469,7 +466,7 @@ class Projeto:
             print("Localidade não definida.")
             return False
         try:
-            script = f"CALL vincular_projeto_localidade({self.cod_projeto, self.localidade.cod_postal});"
+            script = f"CALL vincular_projeto_localidade({self.cod_projeto}, {self.localidade.cod_postal});"
             cursor.execute(script)
             cursor.commit()
             return True
@@ -508,7 +505,7 @@ class Projeto:
             print("Congresso não definido.")
             return False
         try:
-            script = f"CALL vincular_projeto_congresso({self.cod_projeto}, {self.congresso.id_congresso}, {self.congresso.objetivo});"
+            script = f"CALL vincular_projeto_congresso({self.cod_projeto}, {self.congresso.id_congresso}, '{self.congresso.objetivo}');"
             cursor.execute(script)
             cursor.commit()
             return True
@@ -516,32 +513,25 @@ class Projeto:
             print(f"Erro ao inserir congresso: {e}")
             return False
         
-    def insere_instituicao_fomentadora(self, cursor):
+    def insere_instituicao(self, cursor):
         if not self.instituicao:
             print("Instituição não definida.")
             return False
         try:
-            script = f"CALL instituicao_fomenta_projeto({self.instituicao.cnpj}, {self.cod_projeto}, '{self.instituicao.tipo_fomento}');"
-            cursor.execute(script)
-            cursor.commit()
-            return True
+            if self.instituicao.tipo_fomento == '':
+                script = f"CALL instituicao_financia_projeto({self.instituicao.cnpj}, {self.cod_projeto});"
+                cursor.execute(script)
+                cursor.commit()
+                return True
+            else:
+                script = f"CALL instituicao_fomenta_projeto({self.instituicao.cnpj}, {self.cod_projeto}, '{self.instituicao.tipo_fomento}');"
+                cursor.execute(script)
+                cursor.commit()
+                return True
         except pyodbc.Error as e:
             print(f"Erro ao inserir instituição: {e}")
             return False
-        
-    def insere_instituicao_financeira(self, cursor):
-        if not self.instituicao_financeira:
-            print("Instituição financeira não definida.")
-            return False
-        try:
-            script = f"CALL instituicao_financia_projeto({self.instituicao.cnpj}, {self.cod_projeto});"
-            cursor.execute(script)
-            cursor.commit()
-            return True
-        except pyodbc.Error as e:
-            print(f"Erro ao inserir instituição financeira: {e}")
-            return False
-        
+    
     def insere_patrimonio(self, cursor):
         if not self.patrimonio:
             print("Patrimônio não definido.")
@@ -554,6 +544,27 @@ class Projeto:
         except pyodbc.Error as e:
             print(f"Erro ao inserir patrimônio: {e}")
             return False
+
+    def insere_membro(self, cursor, tipo_membro=""):
+        tipo_membro = tipo_membro.upper()
+        if not self.membro:
+            print("Membro não definido.")
+            return False
+        try:
+            if tipo_membro == "ESTUDANTE":
+                script = f"CALL vincular_estudante_projeto({self.cod_projeto}, {self.membro.id_membro});"
+                cursor.execute(script)
+                cursor.commit()
+                return True
+            else:
+                script = f"CALL vincular_pesquisador_projeto({self.cod_projeto}, {self.membro.id_membro}, '{self.membro.funcao}');"
+                cursor.execute(script)
+                cursor.commit()
+                return True
+        except pyodbc.Error as e:
+            print(f"Erro ao inserir membro: {e}")
+            return False
+
 
 class Localidade:
     def __init__(self, cod_postal="", pais="", uf="", cidade=""):
@@ -601,7 +612,7 @@ class LinhaPesquisa:
             cursor.execute(script)
             linha_pesquisa = cursor.fetchone()
             if linha_pesquisa:
-                self.id_linha = linha_pesquisa[0][0]
+                self.id_linha = linha_pesquisa[0]
             else:
                 print("Linha de pesquisa não encontrada após criação.")
                 return False
@@ -622,20 +633,21 @@ class LinhaPesquisa:
 
 
 class Membro:
-    def __init__(self, id_pesquisador="", funcao=""):
-        self.id_pesquisador = id_pesquisador
-        self.funcao = funcao
+    def __init__(self, id_membro="", funcao="pesquisador"):
+        self.id_membro = id_membro
+        self.funcao = funcao.lower()
 
-    def lista_membro(self, cursor, tipo_membro):
+    def lista_membros(self, cursor, tipo_membro):
+        tipo_membro = tipo_membro.upper()
         try:
-            if tipo_membro == "pesquisador":
+            if tipo_membro == "PESQUISADOR":
                 
                 script = "SELECT * FROM MEMBRO WHERE Departamento IS NOT NULL;"
                 cursor.execute(script)
                 pesquisadores = cursor.fetchall()
                 return pesquisadores
                 
-            elif tipo_membro == "estudante":
+            elif tipo_membro == "ESTUDANTE":
 
                 script = "SELECT * FROM MEMBRO WHERE Matrícula IS NOT NULL;"
                 cursor.execute(script)
@@ -654,15 +666,15 @@ class Membro:
             return None
         
 class AreaAtuacao:
-    def __init__(self, id_area="", abrangecia="", nome_area="", descricao_area=""):
+    def __init__(self, id_area="", abrangencia="", nome_area="", descricao_area=""):
         self.id_area = id_area
-        self.abrangecia = abrangecia
+        self.abrangencia = abrangencia
         self.nome_area = nome_area
         self.descricao_area = descricao_area
 
     def criar_area_atuacao(self, cursor):
         try:
-            script = f"CALL inserir_area_atuacao('{self.nome_area}', '{self.abrangecia}', '{self.descricao_area}');"
+            script = f"CALL inserir_area_atuacao('{self.nome_area}', '{self.abrangencia}', '{self.descricao_area}');"
             cursor.execute(script)
             cursor.commit()
 
@@ -670,7 +682,7 @@ class AreaAtuacao:
             cursor.execute(script)
             area_atuacao = cursor.fetchone()
             if area_atuacao:
-                self.id_area = area_atuacao[0][0]
+                self.id_area = area_atuacao[0]
             else:
                 print("Área de atuação não encontrada após criação.")
                 return False
@@ -706,7 +718,7 @@ class Congresso:
             cursor.execute(script)
             congresso = cursor.fetchone()
             if congresso:
-                self.id_congresso = congresso[0][0]
+                self.id_congresso = congresso[0]
             else:
                 print("Congresso não encontrado após criação.")
                 return False
@@ -731,7 +743,6 @@ class Instituicao:
         self.tipo_fomento = tipo_fomento
 
     def lista_instituicoes(self, cursor):
-        categoria = categoria.upper()
         try:
             
             script = "SELECT * FROM INSTITUICAO;"
