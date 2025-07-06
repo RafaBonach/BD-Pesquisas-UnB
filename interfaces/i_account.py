@@ -1,6 +1,7 @@
 from utils import *
-from models_db import insert_account, account_in_db, get_acc, delete_acc, link_acc, link_location
+from models_db import *
 from interfaces.i_profile import IProfile
+from telas_db import *
 
 class IAccount:
     def __init__(self, cursor):
@@ -20,13 +21,11 @@ class IAccount:
         options = ["Cancelar", "Instituição", "Pesquisador", "Estudante", "Colaborador Externo"]
         print_menu(options, "Registro", "Escolha o tipo de conta:")
 
-        choice = input_choice(len(options))
+        acc_type = input_choice(len(options))
 
-        if choice == 0:
+        if acc_type == 0:
             return
-        elif choice > 0 and choice < 5:
-            acc_type = choice
-        else:
+        elif acc_type > 4:
             input("\nOpção inválida.")
             return
 
@@ -54,11 +53,11 @@ class IAccount:
             input("\nFalha na criação da conta!")
             return
 
-        acc_id = get_acc(self.cursor, username, password)[0]
+        acc_id = get_acc(self.cursor, username)[0]
 
         entity_id = None
         # criar entidade
-        match (choice):
+        match (acc_type):
             case 1:
                 entity_id = self.create_institution_menu()
             case 2:
@@ -77,7 +76,7 @@ class IAccount:
             return
 
         # ligar conta e entidade
-        if not link_acc(self.cursor, int(acc_id), entity_id):
+        if not link_acc(self.cursor, acc_id, entity_id):
             delete_acc(self.cursor, acc_id)
 
             input("\nFalha na criação de conta.")
@@ -95,7 +94,7 @@ class IAccount:
         print("Senha:")
         password = input()
 
-        acc_info = get_acc(self.cursor, username, password)
+        acc_info = get_acc(self.cursor, username)
 
         if not acc_info:
             input("Não foi possível fazer login. Tente novamente.")
@@ -104,7 +103,8 @@ class IAccount:
         self.account = {
             "id" : acc_info[0],
             "type" : acc_info[1],
-            "name" : acc_info[2]
+            "name" : acc_info[2],
+            "id_entity" : acc_info[3]
         }
 
         input("Login efetuado com sucesso!")
@@ -118,37 +118,60 @@ class IAccount:
         profile.run()
 
 
-    def set_location(self):
+    def set_location(self, name):
+        postal_code = input("Código postal: ")
+        if not check_max_len(postal_code, 8):
+            input("\nCódigo Postal inválido.")
+            return False
+
         country = input("País de origem: ")
         if not check_max_len(country, 45):
-            input("\nPaís inválido.")
+            print("\nPaís inválido.")
             return False
 
         uf = input("UF em que reside: ")
         if len(uf) != 2:
-            input("\nUF inválida.")
+            print("\nUF inválida.")
             return False
 
         city = input("Cidade em que reside: ")
         if not check_max_len(city, 45):
-            input("\nCidade inválida.")
+            print("\nCidade inválida.")
             return False
 
-        link_location(self.account["id"])
+        if not insert_location(self.cursor, postal_code, country, uf, city):
+            print("\nEste código postal já está cadastrado.")
+            return False
+
+        member_id = get_entity_id(self.cursor, 1, name)
+        
+        if not member_id:
+            print("\nRegistro de membro não está devidamente cadastrado.")
+            return False
+
+        if not link_location(self.cursor, member_id, postal_code):
+            delete_loc(self.cursor, postal_code)
+            print("\nO código postal não está cadastrado.")
+            return False
+
         return True
 
 
     def create_institution_menu(self):
         clear()
         print_menu(title="Registro - Instituição", description="Preencha os campos:\n")
-        
+
+        cnpj = input("CNPJ: ")
+        if not cnpj.isnumeric():
+            print("\nCNPJ inválido")
+
         name = input("Nome (até 40 caracteres): ")
         if not check_max_len(name, 40):
             print("\nNome inválido.")
             return None
 
-        abbreviation = input("Sigla (até 10 caracteres): ")
-        if not check_max_len(abbreviation, 10):
+        acronym = input("Sigla (até 10 caracteres): ")
+        if not check_max_len(acronym, 10):
             print("\nSigla inválida.")
             return None
 
@@ -175,13 +198,18 @@ class IAccount:
         description = input("Nova descrição: ")
         if len(description) == 0:
             print("\nDescrição inválida.")
+            return
 
-        # insert
 
-        # get id
+        if not inserir_instituicao(self.cursor, cnpj, name, acronym, legal_category, uf, location, invested_amount, description):
+            return
 
-        input("\nRegistro realizado com sucesso.")
-        # return id
+        entity_id = get_entity_id(self.cursor, 0, name)
+
+        if not entity_id:
+            return
+
+        return entity_id
 
 
     def create_researcher_menu(self):
@@ -208,13 +236,21 @@ class IAccount:
             print("\nDepartamento inválido.")
             return
 
-        # insert
 
-        # get id
+        if not inserir_pesquisador(self.cursor, name, qualification, description, department):
+            return
 
-        input("\nRegistro realizada com sucesso.")
-        return True
-    
+        entity_id = get_entity_id(self.cursor, 1, name)
+
+        if not entity_id:
+            return
+
+        if not self.set_location(name):
+            deletar_membro(self.cursor, entity_id)
+            return
+
+        return entity_id
+
 
     def create_student_menu(self):
         clear()
@@ -240,38 +276,56 @@ class IAccount:
             print("\nMatrícula inválida.")
             return False
 
-        # insert
+        course = input("Curso: ")
 
-        # get id
+        if not inserir_estudante(self.cursor, name, qualification, description, registration, course):
+            return
 
-        input("\nRegistro realizado com sucesso.")
-        return True
+        entity_id = get_entity_id(self.cursor, 1, name)
+
+        if not entity_id:
+            return
+
+        if not self.set_location(name):
+            deletar_membro(self.cursor, entity_id)
+            return
+
+        return entity_id
 
 
     def create_extern_menu(self):
         clear()
         print_menu(title="Registro - Colab. Ext.", description="Preencha os campos:\n")
 
-        new_name = input("Nome (até 40 caracteres): ")
-        if not check_max_len(new_name, 40):
+        name = input("Nome (até 40 caracteres): ")
+        if not check_max_len(name, 40):
             print("\nNome inválido.")
             return
 
-        new_qualification = input("Titulação (até 15 caracteres): ")
-        if not check_max_len(new_qualification, 15):
+        qualification = input("Titulação (até 15 caracteres): ")
+        if not check_max_len(qualification, 15):
             print("\nTitulação inválida.")
             return
 
-        new_description = input("Nova descrição: ")
-        if len(new_description) == 0:
+        description = input("Nova descrição: ")
+        if len(description) == 0:
             print("\nDescrição inválida.")
+            return
 
-        # insert
 
-        # get id
+        if not inserir_membro_externo(self.cursor, name, qualification, description):
+            return
 
-        input("\nRegistro realizado com sucesso.")
-        return True
+        entity_id = get_entity_id(self.cursor, 1, name)
+        
+        if not entity_id:
+            return
+
+        if not self.set_location(name):
+            deletar_membro(self.cursor, entity_id)
+            return
+
+        return entity_id
 
 
     def run(self):
