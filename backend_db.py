@@ -105,7 +105,7 @@ def create_procedures_sql_script(password, db_name='db_pesquisas', sql_script_pa
             AND routine_type = 'PROCEDURE'
                        """)
         
-        existing_procedures = [row[0].upper() for row in cursor.fetchall()]
+        existing_procedures = [row[0].lower() for row in cursor.fetchall()]
 
         expected_procedures = ['inserir_projeto', 'deletar_projeto', 'inserir_tipo_projeto',
                                'deletar_tipo_projeto', 'inserir_localidade', 'vincular_projeto_localidade',
@@ -138,8 +138,55 @@ def create_procedures_sql_script(password, db_name='db_pesquisas', sql_script_pa
     except pyodbc.Error as e:
         print("Erro ao criar procedimentos:", e)
 
+def create_view_sql_script(password, db_name='db_pesquisas', sql_script_path='media/script_view.sql'):
+    try:
+        conexao = connect_to_database(db_name, password=password)
+        if isinstance(conexao, Exception):
+            return None
+        
+        cursor = conexao.cursor()
+
+        cursor.execute("""
+            SELECT table_name 
+            FROM information_schema.views 
+            WHERE table_schema = 'public'
+            AND table_type = 'VIEW'
+        """)
+
+        existing_views = [row[0].upper() for row in cursor.fetchall()]
+
+        expected_views = ['VW_DETALHES_PROJETOS_AGRUPADA',
+                          'VW_DETALHES_MEMBROS_AGRUPADA',
+                          'VW_DETALHES_INSTITUICOES_AGRUPADA']
+
+        views_found = [view for view in expected_views if view in existing_views]
+
+        if len(views_found) == len(expected_views):
+            return True
+        elif len(views_found) > 0:
+            for view in reversed(expected_views):
+                if view in existing_views:
+                    try:
+                        cursor.execute(f"DROP VIEW IF EXISTS {view} CASCADE")
+                        print(f"   - View {view} removida")
+                    except pyodbc.Error as e:
+                        print(f"   ⚠️  Erro ao remover {view}: {e}")
+            conexao.commit()
+
+        with open(sql_script_path, 'r', encoding='utf-8') as file:
+            script = file.read()
+        
+        cursor.execute(script)
+        conexao.commit()
+        print("View criada com sucesso!")
+        conexao.close()
+    except pyodbc.Error as e:
+        print("Erro ao criar view:", e)
+
 if __name__ == "__main__":
     # Exemplo de uso
     password = input("Digite a senha do banco de dados: ")
     create_database(password)
     create_tables_sql_script(password)
+    create_procedures_sql_script(password)
+    create_view_sql_script(password)
