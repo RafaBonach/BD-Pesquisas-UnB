@@ -1,5 +1,5 @@
 CREATE TABLE MEMBRO (
-  Id_Membro        INT          PRIMARY KEY,
+  Id_Membro        SERIAL       PRIMARY KEY,
   Nome             VARCHAR(45)  NOT NULL,
   Titulação        VARCHAR(15)  NOT NULL,
   Descrição        text,
@@ -14,20 +14,24 @@ CREATE TABLE MEMBRO (
 
 /* Projeto tem um tipo */
 CREATE TABLE TIPO_PROJETO (
-  Id_Tipo_Proj  INT          PRIMARY KEY,
-  Nome_Tipo     VARCHAR(20)  NOT NULL
+  Id_Tipo_Proj  INT          GENERATED ALWAYS AS IDENTITY, /*Modifiquei id para serial*/
+  Nome_Tipo     VARCHAR(20)  NOT NULL,
+
+  PRIMARY KEY  (Id_Tipo_Proj) /*Modifiquei a chave primaria*/
 );
 
 CREATE TABLE PROJETO (
-  Cod_Proj        INT          UNIQUE,
-  Id_Tipo_Proj    INT          UNIQUE,
+  Cod_Proj        INT          GENERATED ALWAYS AS IDENTITY,  /*Modifiquei id para serial*/
+  Id_Tipo_Proj    INT,
   Título          VARCHAR(75)  NOT NULL,
   Data_final      DATE         NOT NULL,
   Data_inicio     DATE         NOT NULL,
   Resumo          text,
+  relatorio       bytea,
 
   PRIMARY KEY  (Cod_Proj, Id_Tipo_Proj),
-  FOREIGN KEY  (Id_Tipo_Proj)    REFERENCES TIPO_PROJETO(Id_Tipo_Proj)
+  UNIQUE	   (Cod_Proj),
+  FOREIGN KEY  (Id_Tipo_Proj)    REFERENCES TIPO_PROJETO(Id_Tipo_Proj) ON DELETE CASCADE
 );
 
 CREATE TABLE INSTITUICAO (
@@ -42,22 +46,28 @@ CREATE TABLE INSTITUICAO (
 );
 
 CREATE TABLE CONGRESSO (
-  Id_Congresso  INT          PRIMARY KEY,
+  Id_Congresso  INT          GENERATED ALWAYS AS IDENTITY,  /*Modifiquei id para serial*/
   Nome          VARCHAR(45)  NOT NULL,
-  Descricao     text
+  Descricao     text,
+
+  PRIMARY KEY  (Id_Congresso) /*Modifiquei a chave primaria*/
 );
 
 CREATE TABLE LINHA_PESQUISA (
-  Id_Linha_Pesquisa  INT          PRIMARY  KEY,
+  Id_Linha_Pesquisa  INT          GENERATED ALWAYS AS IDENTITY, /*Modifiquei id para serial*/
   Nome               VARCHAR(45)  NOT NULL,
-  Descrição          text
+  Descrição          text,
+
+  PRIMARY KEY  (Id_Linha_Pesquisa) /* Transformei id em PK */
 );
 
 CREATE TABLE AREA_ATUACAO (
-  Id_Area_Atuacao  INT          PRIMARY KEY,
+  Id_Area_Atuacao  INT          GENERATED ALWAYS AS IDENTITY, /*Modifiquei id para serial*/
   Abrangencia      VARCHAR(12)  NOT NULL,
   Nome             VARCHAR(45)  NOT NULL,
-  Descrição        text
+  Descrição        text,
+
+  PRIMARY KEY  (Id_Area_Atuacao) /* Transformei id em PK */
 );
 
 CREATE TABLE LOCALIDADE (
@@ -69,13 +79,13 @@ CREATE TABLE LOCALIDADE (
 
 CREATE TABLE PATRIMONIO (
   Cod_Proj       INT,
-  Id_Patrimonio  INT,
+  Id_Patrimonio  INT          GENERATED ALWAYS AS IDENTITY, /*Modifiquei id para serial*/
   Nome           VARCHAR(30)  NOT NULL,
   Custo          INT          NOT NULL,
   Especificacao  text,
 
   PRIMARY KEY  (Id_Patrimonio, Cod_Proj),
-  FOREIGN KEY  (Cod_Proj)  REFERENCES  PROJETO(Cod_Proj)
+  FOREIGN KEY  (Cod_Proj)  REFERENCES  PROJETO(Cod_Proj) ON DELETE CASCADE
 );
 
 
@@ -85,7 +95,7 @@ CREATE TABLE Email (
   id_membro  INT,
 
   PRIMARY KEY (Email, id_membro),
-  FOREIGN KEY (id_membro) REFERENCES MEMBRO(id_Membro)
+  FOREIGN KEY (id_membro) REFERENCES MEMBRO(id_Membro) ON DELETE CASCADE
 );
 
 /* Membro tem origem em Localidade */
@@ -94,8 +104,8 @@ CREATE TABLE Origem (
   Id_Membro   INT,
 
   PRIMARY KEY  (Id_Membro, Cod_postal),
-  FOREIGN KEY  (Id_Membro)   REFERENCES MEMBRO(Id_Membro),
-  FOREIGN KEY  (Cod_postal)  REFERENCES LOCALIDADE(Cod_postal)
+  FOREIGN KEY  (Id_Membro)   REFERENCES MEMBRO(Id_Membro) ON DELETE CASCADE,
+  FOREIGN KEY  (Cod_postal)  REFERENCES LOCALIDADE(Cod_postal) ON DELETE CASCADE
 );
 
 /* Pesquisador atua em Área de atuação */
@@ -104,8 +114,8 @@ CREATE TABLE Atua (
   Id_Area_Atuacao  INT,
 
   PRIMARY KEY  (Id_Pesquisador, Id_Area_Atuacao),
-  FOREIGN KEY  (Id_Pesquisador)   REFERENCES  MEMBRO(Id_Membro),
-  FOREIGN KEY  (Id_Area_Atuacao)  REFERENCES  AREA_ATUACAO(Id_Area_Atuacao)
+  FOREIGN KEY  (Id_Pesquisador)   REFERENCES  MEMBRO(Id_Membro) ON DELETE CASCADE,
+  FOREIGN KEY  (Id_Area_Atuacao)  REFERENCES  AREA_ATUACAO(Id_Area_Atuacao) ON DELETE CASCADE
 );
 
 /* Pesquisador pesquisa Projeto */
@@ -115,8 +125,8 @@ CREATE TABLE Pesquisa (
   Funcao          VARCHAR(12)  NOT NULL,
 
   PRIMARY KEY  (Id_Pesquisador, Cod_Proj),
-  FOREIGN KEY  (Id_Pesquisador)  REFERENCES MEMBRO(Id_Membro),
-  FOREIGN KEY  (Cod_Proj)        REFERENCES PROJETO(Cod_Proj)
+  FOREIGN KEY  (Id_Pesquisador)  REFERENCES MEMBRO(Id_Membro) ON DELETE CASCADE,
+  FOREIGN KEY  (Cod_Proj)        REFERENCES PROJETO(Cod_Proj) ON DELETE CASCADE
 );
 
 /* Estudante realiza Projeto */
@@ -125,8 +135,8 @@ CREATE TABLE Realiza (
   Cod_Proj      INT,
 
   PRIMARY KEY  (Id_Estudante, Cod_Proj),
-  FOREIGN KEY  (Id_Estudante)  REFERENCES MEMBRO(Id_Membro),
-  FOREIGN KEY  (Cod_Proj)      REFERENCES PROJETO(Cod_Proj)
+  FOREIGN KEY  (Id_Estudante)  REFERENCES MEMBRO(Id_Membro) ON DELETE CASCADE,
+  FOREIGN KEY  (Cod_Proj)      REFERENCES PROJETO(Cod_Proj) ON DELETE CASCADE
 );
 
 
@@ -136,8 +146,8 @@ CREATE TABLE Possui (
   Cod_postal  INT,
 
   PRIMARY KEY  (Cod_Proj, Cod_postal),
-  FOREIGN KEY  (Cod_Proj)    REFERENCES PROJETO(Cod_Proj),
-  FOREIGN KEY  (Cod_postal)  REFERENCES LOCALIDADE(Cod_postal)
+  FOREIGN KEY  (Cod_Proj)    REFERENCES PROJETO(Cod_Proj) ON DELETE CASCADE,
+  FOREIGN KEY  (Cod_postal)  REFERENCES LOCALIDADE(Cod_postal) ON DELETE CASCADE
 );
 
 /* Projeto vincula Área de atuação */
@@ -146,8 +156,8 @@ CREATE TABLE Vincula (
   Id_Area_Atuacao  INT,
 
   PRIMARY KEY  (Cod_Proj, Id_Area_Atuacao),
-  FOREIGN KEY  (Cod_Proj)         REFERENCES PROJETO(Cod_Proj),
-  FOREIGN KEY  (Id_Area_Atuacao)  REFERENCES AREA_ATUACAO(Id_Area_Atuacao)
+  FOREIGN KEY  (Cod_Proj)         REFERENCES PROJETO(Cod_Proj) ON DELETE CASCADE,
+  FOREIGN KEY  (Id_Area_Atuacao)  REFERENCES AREA_ATUACAO(Id_Area_Atuacao) ON DELETE CASCADE
 );
 
 /* Projeto executa uma Linha de pesquisa */
@@ -156,8 +166,8 @@ CREATE TABLE Executa (
   Id_Linha_Pesquisa  INT,
 
   PRIMARY KEY  (Cod_Proj, Id_Linha_Pesquisa),
-  FOREIGN KEY  (Cod_Proj)           REFERENCES PROJETO(Cod_Proj),
-  FOREIGN KEY  (Id_Linha_Pesquisa)  REFERENCES LINHA_PESQUISA(Id_Linha_Pesquisa)
+  FOREIGN KEY  (Cod_Proj)           REFERENCES PROJETO(Cod_Proj) ON DELETE CASCADE,
+  FOREIGN KEY  (Id_Linha_Pesquisa)  REFERENCES LINHA_PESQUISA(Id_Linha_Pesquisa) ON DELETE CASCADE
 );
 
 /* Projeto participa de um Congresso */
@@ -167,8 +177,8 @@ CREATE TABLE Participa (
   Objetivo      text,
 
   PRIMARY KEY (Id_Proj, Id_Congresso),
-  FOREIGN KEY (Id_Proj)       REFERENCES PROJETO(Cod_Proj),
-  FOREIGN KEY (Id_Congresso)  REFERENCES CONGRESSO(Id_Congresso)
+  FOREIGN KEY (Id_Proj)       REFERENCES PROJETO(Cod_Proj) ON DELETE CASCADE,
+  FOREIGN KEY (Id_Congresso)  REFERENCES CONGRESSO(Id_Congresso) ON DELETE CASCADE
 );
 
 
@@ -178,7 +188,7 @@ CREATE TABLE CNAE (
   CNAE              VARCHAR(20),
   
   PRIMARY KEY  (CNPJ_Instituicao, CNAE),
-  FOREIGN KEY  (CNPJ_Instituicao)  REFERENCES  INSTITUICAO(CNPJ)
+  FOREIGN KEY  (CNPJ_Instituicao)  REFERENCES  INSTITUICAO(CNPJ) ON DELETE CASCADE
 );
 
 /* Instituição financia Projeto */
@@ -187,8 +197,8 @@ CREATE TABLE Financia (
   CNPJ      INT,
 
   PRIMARY KEY  (Cod_Proj, CNPJ),
-  FOREIGN KEY  (Cod_Proj)  REFERENCES PROJETO(Cod_Proj),
-  FOREIGN KEY  (CNPJ)      REFERENCES INSTITUICAO(CNPJ)
+  FOREIGN KEY  (Cod_Proj)  REFERENCES PROJETO(Cod_Proj) ON DELETE CASCADE,
+  FOREIGN KEY  (CNPJ)      REFERENCES INSTITUICAO(CNPJ) ON DELETE CASCADE
 );
 
 /* Instituição fomenta Projeto */
@@ -198,8 +208,8 @@ CREATE TABLE Fomenta (
   Tipo      VARCHAR(20)  NOT NULL,
 
   PRIMARY KEY  (CNPJ, Cod_Proj),
-  FOREIGN KEY  (CNPJ)      REFERENCES INSTITUICAO(CNPJ),
-  FOREIGN KEY  (Cod_Proj)  REFERENCES PROJETO(Cod_Proj)
+  FOREIGN KEY  (CNPJ)      REFERENCES INSTITUICAO(CNPJ) ON DELETE CASCADE,
+  FOREIGN KEY  (Cod_Proj)  REFERENCES PROJETO(Cod_Proj) ON DELETE CASCADE
 );
 
 
@@ -209,17 +219,18 @@ CREATE TABLE Edicao (
   Cod_edicao    INT,
 
   PRIMARY KEY  (Id_Congresso, Cod_edicao),
-  FOREIGN KEY  (Id_Congresso)  REFERENCES CONGRESSO(Id_Congresso)
+  FOREIGN KEY  (Id_Congresso)  REFERENCES CONGRESSO(Id_Congresso) ON DELETE CASCADE
 );
 
 
 /* Contas de usuário do sistema */
 /* Tipo: 0, 1, 2, 3 -> instituiçao, pesquisador, estudante, colaborador externo */
 CREATE TABLE Conta (
-  Id_Conta  SERIAL       PRIMARY KEY,
-  Tipo      INT          NOT NULL,
-  Nome      VARCHAR(15)  NOT NULL,
-  Senha     CHAR(8)      NOT NULL,
+  Id_Conta     SERIAL       PRIMARY KEY,
+  Tipo         INT          NOT NULL,
+  Nome         VARCHAR(15)  NOT NULL,
+  Senha        CHAR(6)      NOT NULL,
+  Id_Entidade  INT,
 
-  UNIQUE (Nome, Senha)
+  UNIQUE (Nome, Senha, Id_Entidade)
 );

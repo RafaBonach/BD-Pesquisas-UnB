@@ -4,7 +4,8 @@
 from utils import *
 from backend_db import *
 from interfaces.i_account import IAccount
-from interfaces.i_search import ISearch
+from interfaces.i_search import *
+from interfaces.i_project import IProject
 import time
 import getpass
 
@@ -23,8 +24,10 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
         
         create_database(password=password, db_name='db_pesquisas')
         create_tables_sql_script(password=password, db_name='db_pesquisas', sql_script_path='media/script_db.sql')
+        create_procedures_sql_script(password=password, db_name='db_pesquisas', sql_script_path='media/script_procedure.sql')
+        create_view_sql_script(password=password, db_name='db_pesquisas', sql_script_path='media/script_view.sql')
         conexao = connect_to_database(database_name='db_pesquisas', password=password)
-
+    
         if isinstance(conexao, Exception):
             erro_str = str(conexao)
 
@@ -58,7 +61,7 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
         
         time.sleep(2)
     
-    options = ["Sair", "Gerenciar conta", "Pesquisar projetos e pesquisadores"]
+    options = ["Sair", "Gerenciar conta", "Pesquisar projetos e pesquisadores", "Gerenciar projetos"]
 
     while True:
         clear()
@@ -87,5 +90,8 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
                 i_acc.run()
             
             case 2:
-                i_search = ISearch(conexao.cursor())
-                i_search.menu()
+                menu(conexao.cursor())
+            
+            case 3:
+                i_proj = IProject(conexao.cursor())
+                i_proj.run()
