@@ -2,10 +2,12 @@ from utils import *
 from models_db import *
 import time
 from datetime import datetime
+import os
 
 class IProject:
-    def __init__(self, cursor):
+    def __init__(self, cursor, cursor_documments=None):
         self.cursor = cursor
+        self.cursor_documments = cursor_documments
 
     def title(self, action):
         clear()
@@ -458,16 +460,57 @@ class IProject:
                         "\nLista de projetos disponíveis:\n")
                 self.list_projects(projeto)
                 id_projeto = input("\n\nDigite o ID do projeto que deseja inserir o relatório: ")
+                if input("\n\nAtenção: O relatório será inserido a partir do primeiro PDF encontrado na pasta documentos. Deseja continuar (S/N): ").upper() != 'S':
+                    print("Operação cancelada.")
+                    time.sleep(1)
+                    return None
                 if not id_projeto.isdigit():
                     print("ID inválido.\n")
                     return None
                 projeto.cod_projeto = int(id_projeto)
-                caminho_relatorio = input("Caminho do relatório: ")
-                if not caminho_relatorio:
-                    print("Caminho do relatório não pode ser vazio.\n")
+                
+                try:
+                    caminhos_possiveis = [
+                        'documentos',           # Pasta na raiz do projeto
+                        '../documentos',        # Pasta um nível acima
+                        './documentos',         # Pasta no diretório atual
+                        os.path.join(os.path.dirname(__file__), '..', 'documentos'),  # Relativo ao arquivo atual
+                        os.path.join(os.getcwd(), 'documentos')  # Relativo ao diretório de trabalho
+                    ]
+                    pasta_documentos = None
+                    for caminho in caminhos_possiveis:
+                        if os.path.exists(caminho):
+                            pasta_documentos = caminho
+                            break
+                    
+
+                    if not pasta_documentos:
+                        print("❌ Pasta documentos não encontrada em nenhum dos caminhos:")
+                        for caminho in caminhos_possiveis:
+                            print(f"   - {os.path.abspath(caminho)}")
+                        print("\n💡 Criando pasta documentos...")
+                        pasta_documentos = 'documentos'
+                        os.makedirs(pasta_documentos, exist_ok=True)
+                        print(f"✅ Pasta criada: {os.path.abspath(pasta_documentos)}")
+                        print("Insira o relatório na pasta documentos e tente novamente")
+                        return None
+                    
+                    arquivos = sorted(os.listdir(pasta_documentos))
+                    pdfs = [f for f in arquivos if f.lower().endswith('.pdf')]
+                except FileNotFoundError:
+                    print("Pasta documentos não encontrada. Certifique-se de que a pasta existe.")
                     return None
-                if projeto.insere_relatorio(self.cursor, caminho_relatorio):
+
+                if not pdfs:
+                    print("Nenhum relatório disponível para inserção.\n")
+                    return None
+                else:
+                    caminho_pdf = os.path.join(pasta_documentos, pdfs[0])
+
+                if projeto.insere_relatorio(self.cursor_documments, caminho_pdf):
                     print(f"\n\nRelatório inserido com sucesso!")
+                    os.remove(caminho_pdf)
+                    print(f"Relatório removido da pasta documentos")
                 else:
                     print("\n\nErro ao inserir o relatório.")
 
@@ -479,15 +522,34 @@ class IProject:
                         "\nLista de projetos disponíveis:\n")
                 self.list_projects(projeto)
                 id_projeto = input("\n\nDigite o ID do projeto que deseja retirar o relatório: ")
+                print("\n\nAtenção: O relatório será recuperado do banco de dados e salvo na pasta documentos.")
+                time.sleep(1)
                 if not id_projeto.isdigit():
                     print("ID inválido.\n")
                     return None
                 projeto.cod_projeto = int(id_projeto)
-                caminho = input("Digite o caminho onde deseja salvar o relatório: ")
-                if caminho:
-                    if projeto.retirar_relatorio(self.cursor, caminho):
+                
+                caminhos_possiveis = [
+                    'documentos',           # Pasta na raiz do projeto
+                    '../documentos',        # Pasta um nível acima
+                    './documentos',         # Pasta no diretório atual
+                    os.path.join(os.path.dirname(__file__), '..', 'documentos'),  # Relativo ao arquivo atual
+                    os.path.join(os.getcwd(), 'documentos')  # Relativo ao diretório de trabalho
+                ]
+                caminho_destino = None
+                for caminho in caminhos_possiveis:
+                    if os.path.exists(caminho):
+                        caminho_destino = caminho
+                        break
+                
+
+                if not caminho_destino:
+                    os.makedirs('documentos', exist_ok=True)
+
+                if caminho_destino:
+                    if projeto.retirar_relatorio(self.cursor_documments, caminho_destino):
                         print(f"\n\nRelatório '{projeto.titulo}' foi retirado com sucesso!")
-                        print(f"Seu relatório foi salvo em: {caminho}/{projeto.titulo}.pdf")
+                        print(f"Seu relatório foi salvo em: {caminho_destino}")
                     else:
                         print("\n\nErro ao retirar o relatório.")
                 else:

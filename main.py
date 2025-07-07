@@ -27,6 +27,7 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
         create_procedures_sql_script(password=password, db_name='db_pesquisas', sql_script_path='media/script_procedure.sql')
         create_view_sql_script(password=password, db_name='db_pesquisas', sql_script_path='media/script_view.sql')
         conexao = connect_to_database(database_name='db_pesquisas', password=password)
+        conexao_documments = connect_to_database_documments(database_name='db_pesquisas', password=password)
     
         if isinstance(conexao, Exception):
             erro_str = str(conexao)
@@ -94,5 +95,5 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
                 i_sea.menu()
             
             case 3:
-                i_proj = IProject(conexao.cursor())
+                i_proj = IProject(conexao.cursor(), conexao_documments.cursor())
                 i_proj.run()

@@ -3,6 +3,7 @@
     criar um banco de dados e criar tabelas a partir de um script SQL.
 """
 import pyodbc
+import psycopg2
 
 def connect_to_database(database_name, password, user_id='postgres'):
     try:
@@ -17,6 +18,18 @@ def connect_to_database(database_name, password, user_id='postgres'):
         return conexao
     
     except pyodbc.Error as e:
+        return e
+
+def connect_to_database_documments(database_name, password, user_id='postgres'):
+    try:
+        conexao = psycopg2.connect(database=database_name,
+                                   user=user_id,
+                                   password=password,
+                                   host='localhost',
+                                   port='5432')
+        conexao.autocommit = True
+        return conexao
+    except psycopg2.Error as e:
         return e
 
 
