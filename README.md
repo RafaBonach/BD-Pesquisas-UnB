@@ -12,16 +12,19 @@ e os códigos SQL usados para estruturá-lo estão disponíveis na diretório
 # Como utilizar
 
 ### Requisitos:
-- PostgreSQL
-- Devart ODBC Driver for PostgreSQL
-- Python 3.10+
-- pyodbc
-- psycopg2-binary
+Requisitos disponiveis em: [requirements.txt](requirements.txt)
 
 Para instalar os pacotes Python:
-```sh
-pip install pyodbc psycopg2-binary
-```
+- Certifique-se de que está no ambiente virtual
+    ```sh
+    python -m venv venv
+    source venv/bin/activate  # Linux/macOS
+    venv\Scripts\activate     # Windows
+    ```
+- Execute o comando:
+    ```sh
+    pip install -r requirements.txt
+    ```
 
 ### Execução
 
