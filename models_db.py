@@ -4,6 +4,7 @@
 """
 import pyodbc
 import psycopg2
+import os
 
 class Pesquisa_projeto:
     def __init__(self, id=None, projeto=""):
@@ -373,7 +374,6 @@ class Projeto:
         try:
             script = f"UPDATE PROJETO SET relatorio = {psycopg2.Binary(conteudo_relatorio)} WHERE cod_proj = {self.cod_projeto};"
             cursor.execute(script)
-            cursor.commit()
             return True
         except pyodbc.Error as e:
             print(f"Erro ao inserir relatório: {e}")
@@ -383,9 +383,6 @@ class Projeto:
         if not self.cod_projeto:
             print("Código do projeto não definido.")
             return False
-        if not self.titulo:
-            print("Título do projeto não definido.")
-            return False
         if caminho_relatorio is None:
             print("Caminho do relatório não definido.")
             return False
@@ -393,15 +390,16 @@ class Projeto:
             script = f"SELECT título, relatorio FROM PROJETO WHERE cod_proj = {self.cod_projeto};"
             cursor.execute(script)
             self.titulo, relatorio = cursor.fetchone()
-            nome_relatorio = self.titulo.replace(" ", "_") + ".pdf"
-            if not caminho_relatorio.endswith('/'):
-                caminho_relatorio += '/'
-            caminho_relatorio = caminho_relatorio + nome_relatorio
+
             if relatorio is None:
                 print("Nenhum relatório encontrado para este projeto.")
                 return False
+            
+            nome_relatorio = self.titulo.replace(" ", "_") + ".pdf"
+            caminho_relatorio = os.path.join(caminho_relatorio, nome_relatorio)
             with open(caminho_relatorio, 'wb') as file:
                 file.write(relatorio)
+
             return True
         except pyodbc.Error as e:
             print(f"Erro ao retirar relatório: {e}")
