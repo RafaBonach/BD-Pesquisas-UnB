@@ -12,10 +12,13 @@ def instituicao_existe(cursor, cnpj):
         print("Erro ao verificar instituição:", e)
         return False
 
-def membro_existe(cursor, nome):
+def membro_existe(cursor, nome=None, id=None):
     """Verifica se um membro já existe pelo Id_Membro."""
     try:
-        cursor.execute("SELECT 1 FROM MEMBRO WHERE Nome = ?", (nome))
+        if nome:
+            cursor.execute("SELECT 1 FROM MEMBRO WHERE Nome = ?", (nome))
+        elif id:
+            cursor.execute("SELECT 1 FROM MEMBRO WHERE id_membro = ?", (id))
         return cursor.fetchone() is not None
     except Exception as e:
         print("Erro ao verificar membro:", e)
@@ -77,7 +80,6 @@ def atualizar_instituicao(cursor, cnpj, nome=None, sigla=None, natureza_jurid=No
             return False
         query = f"UPDATE INSTITUICAO SET {', '.join(campos)} WHERE CNPJ = ?"
         valores.append(cnpj)
-        print("query", query, valores)
         cursor.execute(query, valores)
 
         print("Instituição atualizada com sucesso!")
@@ -89,11 +91,16 @@ def atualizar_instituicao(cursor, cnpj, nome=None, sigla=None, natureza_jurid=No
 ## Excluir ##
 def deletar_instituicao(cursor, cnpj):
     try:
+        if not instituicao_existe(cursor, cnpj):
+            return
+
         cursor.execute("DELETE FROM INSTITUICAO WHERE CNPJ = ?", (cnpj,))
 
         print("Instituição deletada com sucesso!")
+        return True
     except pyodbc.Error as  e:
         print("Erro ao deletar instituição:", e)
+        return -1
 
 
 ### TELA MEMBRO
@@ -173,11 +180,17 @@ def atualizar_membro(cursor, id_membro, nome=None, titulacao=None, descricao=Non
 
 def deletar_membro(cursor, id_membro):
     try:
+        if not membro_existe(cursor, id=id_membro):
+            input("membro existe")
+            return
+
         cursor.execute("DELETE FROM MEMBRO WHERE Id_Membro = ?", (id_membro))
 
         print("Membro deletado com sucesso!")
+        return True
     except pyodbc.Error as e:
         print("Erro ao deletar membro:", e)
+        return -1
 
 ### PARA ATRIBUTOS MULTIVALORADOS
 ## CRUD PARA EMAIL(MEMBRO)

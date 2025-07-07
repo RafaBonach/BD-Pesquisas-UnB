@@ -57,7 +57,7 @@ class IProfile:
         
         new_description = input("Nova descrição: ")
 
-        if not atualizar_instituicao(self.cursor, self.info[0], new_name, new_acronym, new_uf, new_legal_category, new_location, new_invested_amount, new_description):
+        if not atualizar_instituicao(self.cursor, self.info[0], new_name, new_acronym, new_legal_category, new_uf, new_location, new_invested_amount, new_description):
             input("\nNada para atualizar.")
             return True
 
@@ -162,11 +162,11 @@ class IProfile:
                 del_ent = deletar_membro(self.cursor, self.account["id_entity"])
             
             if not del_ent:
-                input("n deletou entidade")
+                input("\nFalha ao deletar conta")
                 return
 
-            if delete_acc(self.cursor, self.account["acc_id"]):
-                input("Conta deletada com sucesso.")
+            if delete_acc(self.cursor, self.account["id"]):
+                input("\nConta deletada com sucesso.")
                 return True
 
 
@@ -195,7 +195,8 @@ class IProfile:
                     if not suc:
                         input("\nFalha na atualização da conta.")
                 case 2:
-                    self.delete_account()
+                    if self.delete_account():
+                        return "delete"
                 case 3:
                     i_search = ISearch(self.cursor, self.type)
                     i_search.menu()

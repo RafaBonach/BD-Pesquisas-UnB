@@ -64,7 +64,7 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
     options = ["Sair", "Gerenciar conta", "Pesquisar projetos e pesquisadores", "Gerenciar projetos"]
 
     while True:
-        #clear()
+        clear()
         print("==========================\n"
               " Gerenciador de Projetos  \n"
               "    de Pesquisa da UnB    \n"

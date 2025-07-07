@@ -115,7 +115,8 @@ class IAccount:
         """account: dicionário de conta, com id, tipo de conta e nome"""
 
         profile = IProfile(cursor, account)
-        profile.run()
+        if profile.run() == "delete":
+            delete_acc(cursor, account["id"])
 
 
     def set_location(self, name):
@@ -180,12 +181,12 @@ class IAccount:
             print("\nNatureza jurídica inválida.")
             return None
 
-        uf = input("Nova UF: ")
+        uf = input("UF: ")
         if len(uf) == 0 or  len(uf) != 2:
             print("\nUF inválida.")
             return None
 
-        location = input("Nova localidade: ")
+        location = input("Localidade: ")
         if not check_max_len(location, 30):
             print("\nLocalidade inválida.")
             return None
@@ -195,7 +196,7 @@ class IAccount:
             print("\nQuantia inválida.")
             return None
 
-        description = input("Nova descrição: ")
+        description = input("Descrição: ")
         if len(description) == 0:
             print("\nDescrição inválida.")
             return
