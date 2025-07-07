@@ -88,8 +88,14 @@ class IProject:
                                 "\nInsira a informação a baixo\n")
                             localidade.cod_postal = input("Código postal: ")
                             localidade.pais = input("País: ")
-                            localidade.uf = input("UF: ")
+                            localidade.uf = input("UF(2 Letras): ")
                             localidade.cidade = input("Cidade: ")
+
+                            if len(localidade.uf) != 2:
+                                print("UF inválida. Deve conter exatamente 2 letras.")
+                                if input("\n\nDeseja inserir outra localidade no projeto?(S/N): ").strip().upper() != 'S':
+                                    break
+                                continue
                             
                             if localidade.cod_postal and localidade.pais and localidade.uf and localidade.cidade:
                                 self.create_localidade(localidade)
@@ -98,9 +104,11 @@ class IProject:
                             else:
                                 print("\n\nDados da localidade inválidos. Localidade não criada.")
                                 projeto.localidade = None
+
+                            if input("\n\nDeseja inserir outra localidade no projeto?(S/N): ").strip().upper() != 'S':
+                                break
                             
-                        if input("\n\nDeseja inserir outra localidade no projeto?(S/N): ").strip().upper() != 'S':
-                            break
+                        
                         
                         
                 
