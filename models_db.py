@@ -576,6 +576,9 @@ class Patrimonio:
 
 def insert_account(cursor, acc_type, acc_name, acc_password):
     try:
+        if account_in_db(cursor, acc_name, acc_password):
+            return False
+
         cursor.execute(f"INSERT INTO Conta (Id_Conta, Tipo, Nome, Senha) VALUES (DEFAULT, {acc_type}, '{acc_name}', '{acc_password}')")
         return True
 
@@ -583,9 +586,12 @@ def insert_account(cursor, acc_type, acc_name, acc_password):
         print(f"Erro na criação de conta!\n{e}")
         return -1
 
-def account_in_db(cursor, acc_name, acc_password):
+def account_in_db(cursor, acc_name=None, acc_id=None):
     try:
-        acc_exists = len(cursor.execute(f"SELECT * FROM Conta WHERE Nome='{acc_name}' AND Senha='{acc_password}'").fetchall()) != 0
+        if acc_name:
+            acc_exists = len(cursor.execute(f"SELECT * FROM Conta WHERE Nome='{acc_name}'").fetchall()) != 0
+        else:
+            acc_exists = len(cursor.execute(f"SELECT * FROM Conta WHERE Id_Conta='{acc_id}'").fetchall()) != 0
 
         return acc_exists
 
@@ -593,9 +599,10 @@ def account_in_db(cursor, acc_name, acc_password):
         print(f"Erro na consulta de conta!\n{e}")
         return -1
 
-def get_acc(cursor, acc_name, acc_password):
+def get_acc(cursor, acc_name):
+    """retorna o registro da conta (id, tipo, nome)"""
     try:
-        acc_record = cursor.execute(f"SELECT Id_Conta, Tipo FROM Conta WHERE Nome='{acc_name}' AND Senha='{acc_password}'").fetchall()
+        acc_record = cursor.execute(f"SELECT Id_Conta, Tipo, Nome, id_entidade FROM Conta WHERE Nome='{acc_name}'").fetchall()
 
         if len(acc_record) == 0:
             return None
@@ -606,9 +613,141 @@ def get_acc(cursor, acc_name, acc_password):
         print(f"Erro na consulta de conta!\n{e}")
         return None
 
-def delete_acc_records(cursor):
+def get_entity_id(cursor, type, name):
+    """retorna o id da entidade
+    
+    type:
+    - 0 Instituição (retorna CNPJ)
+    - 1 Membro (retorna Id_Membro)
+    """
+
     try:
-        cursor.execute("DELETE FROM Conta")
+        if type == 0:
+            acc_record = cursor.execute(f"SELECT CNPJ FROM INSTITUICAO WHERE Nome='{name}'").fetchall()
+        elif type == 1:
+            acc_record = cursor.execute(f"SELECT Id_Membro FROM MEMBRO WHERE Nome='{name}'").fetchall()
+        else:
+            return None
+            
+
+        if len(acc_record) == 0:
+            return None
+
+        return acc_record[0][0]
 
     except pyodbc.Error as e:
-        print(f"Erro na deleção de contas!\n{e}")
+        print(f"Erro na consulta de entidade!\n{e}")
+        return None
+
+def get_entity_info(cursor, _type, name=None, id=None):
+    """retorna todas colunas de entidade
+    
+    _type:
+    - 0 Instituição
+    - 1 Membro
+    """
+
+    try:
+        if id:
+            if _type == 0:
+                acc_record = cursor.execute(f"SELECT * FROM INSTITUICAO WHERE CNPJ='{id}'").fetchall()
+            elif _type == 1:
+                acc_record = cursor.execute(f"SELECT * FROM MEMBRO WHERE Id_Membro='{id}'").fetchall()
+        else:
+            if _type == 0:
+                acc_record = cursor.execute(f"SELECT * FROM INSTITUICAO WHERE Nome='{name}'").fetchall()
+            elif _type == 1:
+                acc_record = cursor.execute(f"SELECT * FROM MEMBRO WHERE Nome='{name}'").fetchall()
+
+        if len(acc_record) == 0:
+            return None
+
+        return acc_record[0]
+
+    except pyodbc.Error as e:
+        print(f"Erro na consulta de entidade!\n{e}")
+        return None
+
+def link_acc(cursor, id_acc, id_entity):
+    """atualiza Id_Entidade de conta para o ID da entidade relacionada"""
+    
+    try:
+        cursor.execute(f"""
+                       UPDATE Conta
+                       SET Id_Entidade='{id_entity}'
+                       WHERE Id_Conta={id_acc}
+                       """)
+
+        return True
+
+    except pyodbc.Error as e:
+        input(f"Erro ao tentar ligar conta a entidade.\n{e}")
+        return False
+
+
+def link_location(cursor, id_member, postal_code):
+    """insere registro de Origem com Cod_Postal e Id_Membro da localidade e membro relacionados"""
+
+    try:
+        if not location_in_db(cursor, postal_code):
+            return False
+
+        cursor.execute(f"INSERT INTO origem values ({postal_code}, {id_member})")
+
+        return True
+
+    except pyodbc.Error as e:
+        input(f"Erro ao tentar ligar localidade e membro.\n{e}")
+        return False
+
+def check_acc_link():
+    return True
+
+
+def delete_acc(cursor, acc_id):
+    try:
+        if not account_in_db(cursor, acc_id=acc_id):
+            return False
+
+        cursor.execute(f"DELETE FROM Conta WHERE Id_conta={acc_id}")
+        return True
+    
+    except pyodbc.Error as e:
+        input(f"Erro ao tentar deletar conta.\n{e}")
+        return -1
+
+def location_in_db(cursor, postal_code):
+    try:
+        loc_exists = len(cursor.execute(f"SELECT * FROM localidade WHERE cod_postal={postal_code}").fetchall()) != 0
+
+        return loc_exists
+
+    except pyodbc.Error as e:
+        print(f"Erro na consulta de localidade!\n{e}")
+        return -1
+
+def insert_location(cursor, postal_code, country, uf, city):
+    try:
+        if location_in_db(cursor, postal_code):
+            return False
+
+        cursor.execute(f"""
+                       INSERT INTO localidade (cod_postal, país, uf, cidade)
+                       VALUES ({postal_code}, '{country}', '{uf}', '{city}')
+                       """)
+
+        return True
+
+    except pyodbc.Error as e:
+        input(f"Erro ao inserir localidade.\n{e}")
+        return -1
+
+def delete_loc(cursor, postal_code):
+    try:
+        if not location_in_db(cursor, postal_code):
+            return False
+    
+        cursor.execute(f"DELETE FROM localidade WHERE cod_postal={postal_code}")
+    except pyodbc.Error as e:
+        input(f"Erro ao deletar localidade.\n{e}")
+        return -1
