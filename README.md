@@ -5,9 +5,9 @@ Maristela Terto de Holanda.
 
 # Modelagem
 
-Os modelos MER e MR que representam a estrutura do banco de dados desenvolvido
-e os códigos SQL usados para estruturá-lo estão disponíveis no diretório
-`media`.
+Os modelos [MER](media/MER.png) e [MR](media/MR.png) que representam a
+estrutura do banco de dados desenvolvido e os códigos SQL usados para estruturá
+-lo estão disponíveis no diretório [media](media).
 
 # Códigos SQL
 
@@ -21,7 +21,7 @@ pesquisa de projetos e visualização de membros e instituições
 Porém, além deles, o CRUD de contas utiliza códigos SQL próprios para suas
 funções.
 
-# Como utilizar
+# Manual de uso
 
 ### Requisitos:
 - PostgreSQL
