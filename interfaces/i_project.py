@@ -449,8 +449,51 @@ class IProject:
                     return None
                 projeto.cod_projeto = int(id_projeto)
                 return projeto
+            
+            case 'i':
+                clear()
+                print("==================================\n"
+                    "  Inserir relatório de projetos    \n"
+                        "================================\n\n"
+                        "\nLista de projetos disponíveis:\n")
+                self.list_projects(projeto)
+                id_projeto = input("\n\nDigite o ID do projeto que deseja inserir o relatório: ")
+                if not id_projeto.isdigit():
+                    print("ID inválido.\n")
+                    return None
+                projeto.cod_projeto = int(id_projeto)
+                caminho_relatorio = input("Caminho do relatório: ")
+                if not caminho_relatorio:
+                    print("Caminho do relatório não pode ser vazio.\n")
+                    return None
+                if projeto.insere_relatorio(self.cursor, caminho_relatorio):
+                    print(f"\n\nRelatório inserido com sucesso!")
+                else:
+                    print("\n\nErro ao inserir o relatório.")
 
+            case 'r':
+                clear()
+                print("======================================\n"
+                        "   Retirar relatório de projetos    \n"
+                        "====================================\n\n"
+                        "\nLista de projetos disponíveis:\n")
+                self.list_projects(projeto)
+                id_projeto = input("\n\nDigite o ID do projeto que deseja retirar o relatório: ")
+                if not id_projeto.isdigit():
+                    print("ID inválido.\n")
+                    return None
+                projeto.cod_projeto = int(id_projeto)
+                caminho = input("Digite o caminho onde deseja salvar o relatório: ")
+                if caminho:
+                    if projeto.retirar_relatorio(self.cursor, caminho):
+                        print(f"\n\nRelatório '{projeto.titulo}' foi retirado com sucesso!")
+                        print(f"Seu relatório foi salvo em: {caminho}/{projeto.titulo}.pdf")
+                    else:
+                        print("\n\nErro ao retirar o relatório.")
+                else:
+                    print("Caminho inválido.")
 
+    
     def create_project(self, projeto):
         if isinstance(projeto, Projeto):
             if projeto.nome_tipo_projeto:
@@ -743,7 +786,6 @@ class IProject:
                       f"CNPJ: {inst[3]}")
                 print(f"\n==========================\n\n")
         return l_instituicoes
-    
 
     def run(self):
         clear()
@@ -752,14 +794,14 @@ class IProject:
               "    de Pesquisa da UnB    \n"
               "==========================\n\n")
         print("Selecione uma opção:")
-        options = ["Voltar", "Criar projeto", "Listar projetos", "Atualizar projeto", "Deletar projeto"]
+        options = ["Voltar", "Criar projeto", "Listar projetos", "Atualizar projeto", "Deletar projeto", "Inserir Relatorio", "Coletar Relatório"]
         print_menu(options)
         choice = input_choice(len(options))
 
         if choice == 0:
             return
         elif choice == 1:
-            data_project = self.title('c')
+            self.title('c')
         elif choice == 2:
             project = self.title('l')
             self.list_projects(project)
@@ -769,6 +811,10 @@ class IProject:
         elif choice == 4:
             project = self.title('d')
             self.delete_project(project)
+        elif choice == 5:
+            self.title('i')
+        elif choice == 6:
+            self.title('r')
         else:
             print("\nOpção inválida. Tente novamente.\n")
             time.sleep(2)

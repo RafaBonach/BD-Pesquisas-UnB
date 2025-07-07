@@ -3,6 +3,7 @@
     Esses modelos serão usados para fazer o CRUD dos dados das tabelas e demais funções relacionadas.
 """
 import pyodbc
+import psycopg2
 
 class Pesquisa_projeto:
     def __init__(self, id=None, projeto=""):
@@ -122,11 +123,6 @@ class Projeto:
         # info patrimonio
         self.patrimonio = patrimonio
 
-    """
-    ====================================================================================
-    CRUD para o tipo de projeto
-    ====================================================================================
-    """
     def criar_t_projeto(self, cursor):
         try:
             script = f"CALL inserir_tipo_projeto('{self.nome_tipo_projeto}');"
@@ -167,12 +163,6 @@ class Projeto:
         except pyodbc.Error as e:
             print(f"Erro ao deletar tipo de projeto: {e}")
             return False
-
-    """
-    ==========================================================================================
-        CRUD para o projeto
-    ==========================================================================================
-    """
 
     def cria_projeto(self, cursor):
         try:
@@ -364,6 +354,60 @@ class Projeto:
                 return True
         except pyodbc.Error as e:
             print(f"Erro ao inserir membro: {e}")
+            return False
+        
+    def insere_relatorio(self, cursor, caminho_relatorio):
+        if not self.cod_projeto:
+            print("Código do projeto não definido.")
+            return False
+        if not caminho_relatorio:
+            print("Caminho do relatório não definido.")
+            return False
+        if not caminho_relatorio.endswith('.pdf'):
+            print("O relatório deve ser um arquivo PDF.")
+            return False
+
+        with open(caminho_relatorio, 'rb') as file:
+            conteudo_relatorio = file.read()
+
+        try:
+            script = f"UPDATE PROJETO SET relatorio = {psycopg2.Binary(conteudo_relatorio)} WHERE cod_proj = {self.cod_projeto};"
+            cursor.execute(script)
+            cursor.commit()
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao inserir relatório: {e}")
+            return False
+
+    def retirar_relatorio(self, cursor, caminho_relatorio=None):
+        if not self.cod_projeto:
+            print("Código do projeto não definido.")
+            return False
+        if not self.titulo:
+            print("Título do projeto não definido.")
+            return False
+        if caminho_relatorio is None:
+            print("Caminho do relatório não definido.")
+            return False
+        try:
+            script = f"SELECT título, relatorio FROM PROJETO WHERE cod_proj = {self.cod_projeto};"
+            cursor.execute(script)
+            self.titulo, relatorio = cursor.fetchone()
+            nome_relatorio = self.titulo.replace(" ", "_") + ".pdf"
+            if not caminho_relatorio.endswith('/'):
+                caminho_relatorio += '/'
+            caminho_relatorio = caminho_relatorio + nome_relatorio
+            if relatorio is None:
+                print("Nenhum relatório encontrado para este projeto.")
+                return False
+            with open(caminho_relatorio, 'wb') as file:
+                file.write(relatorio)
+            return True
+        except pyodbc.Error as e:
+            print(f"Erro ao retirar relatório: {e}")
+            return False
+        except FileNotFoundError as e:
+            print(f"Erro ao salvar o relatório: {e}")
             return False
 
 
