@@ -90,7 +90,8 @@ if __name__ == "__main__": # Se o arquivo for executado diretamente, executa o c
                 i_acc.run()
             
             case 2:
-                menu(conexao.cursor())
+                i_sea = ISearch(conexao.cursor(), info=None)
+                i_sea.menu()
             
             case 3:
                 i_proj = IProject(conexao.cursor())

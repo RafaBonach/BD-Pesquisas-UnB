@@ -2,7 +2,7 @@ from utils import *
 from models_db import *
 import time
 
-def i_titulo(tipo_pesquisa, id=""):
+def i_titulo(tipo_pesquisa):
     match(tipo_pesquisa):
         case "pro":
             clear()
@@ -12,13 +12,8 @@ def i_titulo(tipo_pesquisa, id=""):
                 "Preencha os dados a seguir para pesquisar um projeto\n"
                 "deixe em branco para pesquisar todos os projetos\n")
             nome_projeto = input("Nome do projeto: ").strip() or ""
-            tipo_projeto = input("Tipo do projeto: ").strip() or ""
-            linha_pesquisa = input("Linha de pesquisa: ").strip() or ""
-            area_atuação = input("Área de atuação: ").strip() or ""
-            nome_membro = input("Nome do membro: ").strip() or ""
-            nome_instituicao = input("Nome da instituição fomentadora: ").strip() or ""
             time.sleep(2)
-            return [id, nome_projeto, tipo_projeto, linha_pesquisa, area_atuação, nome_membro, nome_instituicao]
+            return [nome_projeto]
         
         case "pesq":
             clear()
@@ -29,10 +24,9 @@ def i_titulo(tipo_pesquisa, id=""):
                 "deixe em branco para pesquisar todos os pesquisadores\n")
             nome_pesquisador = input("Nome do pesquisador: ").strip() or ""
             instituicao = input("Instituição: ").strip() or ""
-            area_atuacao = input("Área de atuação: ").strip() or ""
             time.sleep(2)
 
-            return [id, nome_pesquisador, instituicao, area_atuacao]
+            return [nome_pesquisador, instituicao]
 
         case "inst":
             clear()
@@ -44,162 +38,87 @@ def i_titulo(tipo_pesquisa, id=""):
             nome_instituicao = input("Nome da instituição: ").strip() or ""
             sigla = input("Sigla: ").strip() or ""
             cnpj = input("CNPJ: ").strip() or ""
-            natureza_juridica = input("Natureza jurídica: ").strip() or ""
-            uf = input("UF: ").strip() or ""
-            localidade = input("Localidade: ").strip() or ""
             time.sleep(2)
 
-            return [id, nome_instituicao, sigla, cnpj, natureza_juridica, uf, localidade]
+            return [nome_instituicao, sigla, cnpj]
         
-        case "est":
-            clear()
-            print("==========================\n"
-                " Pesquisa por Estudante  \n"
-                "==========================\n\n"
-                "Preencha os dados a seguir para pesquisar um estudante\n"
-                "deixe em branco para pesquisar todas os estudantes\n")
-            nome_estudante = input("Nome do estudante: ").strip() or ""
-            titulacao = input("Titulação: ").strip() or ""
-            descricao = input("Descrição: ").strip() or ""
-            matricula = input("Matrícula: ").strip() or ""
-            curso_estudante = input("Curso: ").strip() or ""
-            time.sleep(2)
-
-            return [id, nome_estudante, titulacao, descricao, matricula, curso_estudante]
-
 def i_resultado(tipo_pesquisa, resultado):
     # clear()
     if resultado is not None:
-        if tipo_pesquisa[-1] == 'd':
-            match(tipo_pesquisa):
-                case "pesq_id":
-                    print(f"Informações do pesquisador {resultado[0][1]}:\n\n")
+        l_resultados = {}
+        match(tipo_pesquisa):
+            case "pro":
+                print("Projetos encontrados:")
+                print("\n==========================\n\n")
+                if resultado:
                     for p in resultado:
-                        print(
-                            f"ID:                                   {p[0]}\n"
-                            f"Titulação:                            {p[2]}\n"
-                            f"Departamento:                         {p[3]}\n"
-                            f"Descrição:                            {p[4]}\n"
-                            f"Área de atuação:                      {p[5]}\n"
-                            f"Email:                                {p[6]}\n"
-                            f"País:                                 {p[7]}\n"
-                            f"UF:                                   {p[8]}\n"
-                            f"Cidade:                               {p[9]}\n"
-                            f"""Areas de Atuação:
-                                    {p[10]}\n"""
-                            f"""Projetos que participa:
-                                    {p[11]}\n"""
-                            f"Quantidade de congressos que participou: {p[12]}\n"
-                            f"""Congressos que participou:
-                                    {p[13]}\n""")
-                
-                case "est_id":
-                    print(f"Informações do estudante {resultado[0][1]}:\n\n")
-                    for e in resultado:
-                        print(
-                            f"ID:                                   {e[0]}\n"
-                            f"Titulação:                            {e[2]}\n"
-                            f"Descrição:                            {e[3]}\n"
-                            f"Matrícula:                            {e[4]}\n"
-                            f"Curso:                                {e[5]}\n"
-                            f"Email:                                {e[6]}\n"
-                            f"Nacionalidade:                        {e[7]}\n"
-                            f"UF:                                   {e[8]}\n"
-                            f"Cidade:                               {e[9]}\n"
-                            f"Projetos que participa ({e[11]}):\n"
-                            f"{e[10]}\n"
-                            )
-        else:
-            match(tipo_pesquisa):
-                case "pro":
-                    print("Projetos encontrados:\n")
-                    print("\n==========================\n\n")
-                    if not resultado:
-                        for p in resultado:
-                            if p[0] is not None:
-                                print(f"Nome:                         {p[0]}\n")
-                            if p[1] is not None:
-                                print(f"Resumo:                       {p[1]}\n")
-                            if p[2] is not None:
-                                print(f"Data de início:               {p[2]}\n")
-                            if p[3] is not None:
-                                print(f"Data de término:              {p[3]}\n")
-                            if p[4] is not None:
-                                print(f"Tipo de projeto:              {p[4]}\n")
-                            if p[5] is not None:
-                                print("Membros envolvidos:"
-                                    f"{p[5]}\n\n")
-                            if p[6] is not None:
-                                print(f"Instituição fomentadora:      {p[6]}\n")
-                            if p[7] is not None:
-                                print(f"Linha de pesquisa:            {p[7]}\n")
-                            if p[8] is not None:
-                                print(f"Área de atuação:              {p[8]}\n")
-                            if p[9] is not None:
-                                print(f"Congressos que participou:    {p[9]}\n")
-                            print("\n\n==========================\n")
-                            time.sleep(1)
-                        print("\n\nTotal de projetos encontrados: ", len(resultado[0]))
-                    else:
-                        print("Nenhum projeto encontrado com os critérios informados.")
-                
-                case "pesq":
-                    print("\n\nPesquisadores encontrados:")
-                    print("\n==========================\n\n")
+                        l_resultados[p[0]] = p[1:]
+                        print(f"Código do projeto:          {p[0] if p[0] else "N/A"}")
+                        print(f"Título:                     {p[1] if p[1] else "N/A"}")
+                        print(f"Data de ínicio:             {p[2] if p[2] else "N/A"}")
+                        print(f"Prazo de entrega:           {p[3] if p[3] else "N/A"}")
+                        print(f"Resumo:                     {p[4] if p[4] else "N/A"}")
+                        print(f"Tipo de projeto:            {p[5] if p[5] else "N/A"}")
+                        print(f"Pesquisadores:              {p[6] if p[6] else "N/A"}")
+                        print(f"Estudantes:                 {p[7] if p[7] else "N/A"}")
+                        print(f"Área de atuação:            {p[8] if p[8] else "N/A"}")
+                        print(f"Congresso que participou:   {p[9] if p[9] else "N/A"}")
+                        print(f"Instituiçao financeira:     {p[10] if p[10] else "N/A"}")
+                        print(f"Instituição fomentadora:    {p[11] if p[11] else "N/A"}")
+                        print(f"Patrimônio do projeto:      {p[12] if p[12] else "N/A"}")
+                        print(f"Localização do projeto:     {p[13] if p[13] else "N/A"}")
+                        print(f"Linhas de pesquisa:         {p[14] if p[14] else "N/A"}")
+                        print("\n\n==========================\n")
+                        time.sleep(1)
+                    print("\n\nTotal de projetos encontrados: ", len(resultado[0]))
+                else:
+                    print("Nenhum projeto encontrado com os critérios informados.")
+            
+            case "pesq":
+                print("\n\nPesquisadores encontrados:")
+                print("\n==========================\n\n")
+                if resultado:
                     for p in resultado:
-                        print(
-                            f"Nome:                                 {p[1]}\n"
-                            f"Titulação:                            {p[2]}\n"
-                            f"Departamento:                         {p[3]}\n"
-                            f"Descrição:                            {p[4]}\n"
-                            f"Área de atuação:                      {p[5]}\n"
-                            f"Email:                                {p[6]}\n"
-                            f"Quantidade de projetos que participa: {p[7]}\n")
-
+                        l_resultados[p[0]] = p[1:]
+                        print(f"Id:                     {p[0] if p[0] else "N/A"}")
+                        print(f"Nome:                   {p[1] if p[1] else "N/A"}")
+                        print(f"Títulação:              {p[2] if p[2] else "N/A"}")
+                        print(f"Descrição:              {p[3] if p[3] else "N/A"}")
+                        print(f"Departamento:           {p[4] if p[4] else "N/A"}")
+                        print(f"Matrícula do estudante: {p[5] if p[5] else "N/A"}")
+                        print(f"Curso do Estudante:     {p[6] if p[6] else "N/A"}")
+                        print(f"Localização de origem:  {p[7] if p[7] else "N/A"}")
+                        print(f"Emails:                 {p[8] if p[8] else "N/A"}")
+                        print(f"Área de atuação:        {p[9] if p[9] else "N/A"}")
+                        print(f"projetos que pesquisa:  {p[10] if p[10] else "N/A"}")
+                        print(f"Projetos que participa: {p[11] if p[11] else "N/A"}")
                         print("\n\n==========================\n")
-                        time.sleep(1)
-                    print("\n\nTotal de pesquisadores encontrados: ", len(resultado[0]))
+                    print("\n\nTotal de pesquisadores encontrados: ", len(l_resultados))
+                    time.sleep(1)
+                else:
+                    print("Nenhum membro encontrado com os critérios informados.")
 
-                case "inst":
-                    print("\n\nInstituições encontradas:")
-                    print("\n==========================\n\n")
-                    for i in resultado:
-                        print(
-                            f"CNPJ:                 {i[0]}\n"
-                            f"Nome:                 {i[1]}\n"
-                            f"Sigla:                {i[2]}\n"
-                            f"Natureza Jurídica:    {i[3]}\n"
-                            f"Descrição:            {i[3]}\n"
-                            f"UF:                   {i[4]}\n"
-                            f"Localidade:           {i[5]}\n"
-                            f"Recursos Investidos:  {i[6]}\n"
-                            f"Projetos financiados:"
-                            f"{i[7]}\n"
-                            f"Projetos fomentados:"
-                            f"{i[8]}\n")
+            case "inst":
+                print("\n\nInstituições encontradas:")
+                print("\n==========================\n\n")
+                if resultado:
+                    for p in resultado:
+                        l_resultados[p[0]] = p[1:]
+                        print(f"CNPJ:                   {p[0] if p[0] else "N/A"}")
+                        print(f"Nome:                   {p[1] if p[1] else "N/A"}")
+                        print(f"Sigla:                  {p[2] if p[2] else "N/A"}")
+                        print(f"Natureza juridica:      {p[3] if p[3] else "N/A"}")
+                        print(f"UF:                     {p[4] if p[4] else "N/A"}")
+                        print(f"Localidade da empresa:  {p[5] if p[5] else "N/A"}")
+                        print(f"Descrição da empresa:   {p[7] if p[7] else "N/A"}")
+                        print(f"CNAE:                   {p[8] if p[8] else "N/A"}")
+                        print(f"Projetos Fomentados:    {p[9] if p[9] else "N/A"}")
+                        print(f"Projetos Financiados:   {p[10] if p[10] else "N/A"}")
                         print("\n\n==========================\n")
-                        time.sleep(1)
-                    print("\n\nTotal de instituições encontradas: ", len(resultado[0]))
-
-                case "est":
-                    print("\n\nEstudantes encontrados:")
-                    print("\n==========================\n\n")
-                    for e in resultado:
-                        print(
-                            f"ID:                                   {e[0]}\n"
-                            f"Nome:                                 {e[1]}\n"
-                            f"Titulação:                            {e[2]}\n"
-                            f"Descrição:                            {e[3]}\n"
-                            f"Matrícula:                            {e[4]}\n"
-                            f"Curso:                                {e[5]}\n"
-                            f"Email:                                {e[6]}\n"
-                            f"Projetos que participa ({e[11]}):\n"
-                            f"{e[10]}\n"
-                            )
-                        print("\n\n==========================\n")
-                        time.sleep(1)
-                    print("\n\nTotal de estudantes encontradas: ", len(resultado[0]))
-
+                    print("\n\nTotal de pesquisadores encontrados: ", len(l_resultados))
+                    time.sleep(1)
+                else:
+                    print("Nenhuma instituição encontrada com os critérios informados.")
     else:
         print("==============================\n"
               "Nenhuma informação encontrado."
@@ -212,20 +131,14 @@ def i_resultado(tipo_pesquisa, resultado):
         exit()
 
 class ISearch:
-    def __init__(self, cursor, info, tipo_conta=""):
+    def __init__(self, cursor, info=""):
         self.cursor = cursor
         self.info = info
-        self.tipo_conta = tipo_conta
 
     def search_projects(self):
         projeto = Pesquisa_projeto(
             id=self.info[0],
             projeto=self.info[1],
-            tipo_projeto=self.info[2],
-            nome_membro=self.info[3],
-            nome_instituicao=self.info[4],
-            linha_pesquisa = self.info[5],
-            area_atuacao =  self.info[6],
         )
         
         resultado = projeto.resultado_pesquisa(self.cursor)
@@ -233,43 +146,19 @@ class ISearch:
         return resultado
 
     def search_pesquisador(self):
-        pesquisador = Pesquisa_pesquisador(
+        pesquisador = Pesquisa_membros(
             id=self.info[0],
             nome_membro=self.info[1],
-            nome_instituicao=self.info[2],
-            area_atuacao=self.info[3]
         )
         
-        if self.tipo_conta == "pesquisador" and pesquisador.id is not None:
-            resultado = pesquisador.info_pesquisador_detalhado(self.cursor)
-        else:
-            resultado = pesquisador.info_pesquisador(self.cursor)
+        resultado = pesquisador.info_pesquisador(self.cursor)
         
         return resultado
     
-    def search_estudante(self):
-        estudante = Pesquisa_estudante(
-            id=self.info[0],
-            nome_estudante=self.info[1],
-            titulacao=self.info[2],
-            descricao=self.info[3],
-            matricula=self.info[4],
-            curso_estudante=self.info[5]
-        )
-        
-        resultado = estudante.info_estudante(self.cursor)
-
-        return resultado
-
     def search_instituicao(self):
         instituicao = Pesquisa_instituicao(
             id=self.info[0],
             nome_instituicao=self.info[1],
-            cnpj=self.info[2],
-            sigla=self.info[3],
-            natureza_juridica=self.info[4],
-            uf=self.info[5],
-            localidade=self.info[6],
         )
         
         resultado = instituicao.info_instituicao(self.cursor)
@@ -278,41 +167,41 @@ class ISearch:
 
 
 
-def menu(cursor):
-    options = ["Voltar", "Pesquisar por Projeto", "Pesquisar por pesquisador", "Pesquisar por instituição"]
+    def menu(self):
+        options = ["Voltar", "Pesquisar por Projeto", "Pesquisar por pesquisador", "Pesquisar por instituição"]
 
-    while True:
-        clear()
-        print("==========================\n"
-                "   Pesquisa de Projetos   \n"
-                "==========================\n\n"
-                "Selecione uma opção:")
-        print_menu(options)
-        choice = input_choice(len(options))
+        while True:
+            clear()
+            print("==========================\n"
+                    "   Pesquisa de Projetos   \n"
+                    "==========================\n\n"
+                    "Selecione uma opção:")
+            print_menu(options)
+            choice = input_choice(len(options))
 
-        if choice == 0:
-            return
-        
-        elif choice == 1:
-            info = i_titulo("pro")
-            search = ISearch(cursor, info)
-            resultado = search.search_projects()
-            i_resultado("pro", resultado)
+            if choice == 0:
+                return
             
-        
-        elif choice == 2:
-            info = i_titulo("pesq")
-            search = ISearch(cursor, info, self.tipo_conta)
-            resultado = search.search_pesquisador()
-            i_resultado("pesq", resultado)
+            elif choice == 1:
+                info = i_titulo("pro")
+                search = ISearch(self.cursor, info)
+                resultado = search.search_projects()
+                i_resultado("pro", resultado)
+                
+            
+            elif choice == 2:
+                info = i_titulo("pesq")
+                search = ISearch(self.cursor, info)
+                resultado = search.search_pesquisador()
+                i_resultado("pesq", resultado)
 
-        elif choice == 3:
-            info = i_titulo("inst")
-            search = ISearch(cursor, info)
-            resultado = search.search_instituicao()
-            i_resultado("inst", resultado)
-        
-        else:
-            input("Opção inválida.")
+            elif choice == 3:
+                info = i_titulo("inst")
+                search = ISearch(self.cursor, info)
+                resultado = search.search_instituicao()
+                i_resultado("inst", resultado)
+            
+            else:
+                input("Opção inválida.")
                 
                 
