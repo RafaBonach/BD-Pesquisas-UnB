@@ -197,8 +197,6 @@ class IProfile:
                 case 2:
                     if self.delete_account():
                         return "delete"
-                case 3:
-                    i_search = ISearch(self.cursor, self.type)
-                    i_search.menu()
+                # pesquisa
                 case _:
                     print("Opção inválida.")
