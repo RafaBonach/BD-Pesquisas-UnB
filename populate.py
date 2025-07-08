@@ -3,42 +3,42 @@ from backend_db import *
 
 tables = {
     "area_atuacao" : [
-        [1,"Ciências Sociais Aplicadas", "Ciências Humanas"],
-        [2,"Diplomacia", "Ciências Sociais Aplicadas"],
-        [3,"Decoração", "Linguística, Letras e Artes"],
-        [4,"Engenharia de Armamentos", "Engenharias"],
-        [5,"Carreira Militar", "Outra"],
-        [6,"Secretariado Executivo", "Ciências Sociais Aplicadas"],
-        [7,"Engenharia de Agrimensura", "Engenharias"],
-        [8,"Segurança Contra Incêndio", "Engenharias"],
-        [9,"Relações Públicas", "Ciências Sociais Aplicadas"],
-        [10,"Carreira Religiosa", "Ciências Humanas"],
-        [11,"Engenharia Cartográfica", "Engenharias"],
-        [12,"Engenharia Têxtil", "Engenharias"],
-        [13,"História Natural", "Ciências Humanas"],
-        [14,"Ciências Atuariais", "Ciências Exatas e da Terra"],
-        [15,"Desenho de Moda", "Linguística, Letras e Artes"],
-        [16,"Administração Rural", "Ciências Sociais Aplicadas"],
-        [17,"Estudos Sociais", "Ciências Humanas"],
-        [18,"Tecnologias Naval e Marítima", "Engenharias"],
-        [19,"Desenho de Projetos", "Engenharias"],
-        [20,"Administração Hospitalar", "Ciências da Saúde"],
-        [21,"Bioética", "Ciências da Saúde"],
-        [22,"Planejamento Energético", "Engenharias"],
-        [23,"Química Industrial", "Ciências Exatas e da Terra"],
-        [24,"Tecnologias nas áreas Aeronáuticas", "Engenharias"],
-        [25,"Fontes Alternativas de Energia", "Engenharias"],
-        [26,"Mudanças Climáticas","Ciências Biológicas"],
-        [27,"Relações Internacionais", "Ciências Sociais Aplicadas"],
-        [28,"Economia Doméstica", "Ciências Humanas"],
-        [29,"Defesa", "Outra"]
+        ["DEFAULT" , "Ciências Humanas", "Ciências Sociais Aplicadas"],
+        ["DEFAULT" , "Diplomacia", "Ciências Sociais Aplicadas"],
+        ["DEFAULT" , "Decoração", "Linguística, Letras e Artes"],
+        ["DEFAULT" , "Engenharia de Armamentos", "Engenharias"],
+        ["DEFAULT" , "Carreira Militar", "Outra"],
+        ["DEFAULT" , "Secretariado Executivo", "Ciências Sociais Aplicadas"],
+        ["DEFAULT" , "Engenharia de Agrimensura", "Engenharias"],
+        ["DEFAULT" , "Segurança Contra Incêndio", "Engenharias"],
+        ["DEFAULT" , "Relações Públicas", "Ciências Sociais Aplicadas"],
+        ["DEFAULT" , "Carreira Religiosa", "Ciências Humanas"],
+        ["DEFAULT" , "Engenharia Cartográfica", "Engenharias"],
+        ["DEFAULT" , "Engenharia Têxtil", "Engenharias"],
+        ["DEFAULT" , "História Natural", "Ciências Humanas"],
+        ["DEFAULT" , "Ciências Atuariais", "Ciências Exatas e da Terra"],
+        ["DEFAULT" , "Desenho de Moda", "Linguística, Letras e Artes"],
+        ["DEFAULT" , "Administração Rural", "Ciências Sociais Aplicadas"],
+        ["DEFAULT" , "Estudos Sociais", "Ciências Humanas"],
+        ["DEFAULT" , "Tecnologias Naval e Marítima", "Engenharias"],
+        ["DEFAULT" , "Desenho de Projetos", "Engenharias"],
+        ["DEFAULT" , "Administração Hospitalar", "Ciências da Saúde"],
+        ["DEFAULT" , "Bioética", "Ciências da Saúde"],
+        ["DEFAULT" , "Planejamento Energético", "Engenharias"],
+        ["DEFAULT" , "Química Industrial", "Ciências Exatas e da Terra"],
+        ["DEFAULT" , "Tecnologias nas áreas Aeronáuticas", "Engenharias"],
+        ["DEFAULT" , "Fontes Alternativas de Energia", "Engenharias"],
+        ["DEFAULT" , "Mudanças Climáticas","Ciências Biológicas"],
+        ["DEFAULT" , "Relações Internacionais", "Ciências Sociais Aplicadas"],
+        ["DEFAULT" , "Economia Doméstica", "Ciências Humanas"],
+        ["DEFAULT" , "Defesa", "Outra"]
     ],
     "localidade" : [
         [70910900, "Brasil", "DF", "Brasília"], # UnB - Darcy
         [5508220, "Brasil", "SP", "São Paulo"], # USP
-        [],
-        [],
-        []
+        [31270901, "Brasil", "MG", "Belo Horizonte"], # UFMG
+        [74690900, "Brasil", "GO", "Goiânia"], # UFGO
+        [13565905, "Brasil", "SP", "São Carlos"] #UFSCAR
     ],
     "projeto" : [
         [0,3, '"Laboratório de Pesquisa em História e Historiografia do Brasil"', '2021-08-09', '2024-09-08', ],
@@ -54,17 +54,17 @@ tables = {
         [10, 6, 'AQUARELA - Aplicações com Qualidade de Serviços em Redes de Alta Velocidade', '2017-07-25', '2023-03-16'],
         [11, 5, 'AQUARIPARIA', '2015-10-28', '2018-09-03'],
         [12, 2, 'AQUASENSE - Sensoriamento remoto para o monitoramento da qualidade das águas continentais', '2022-03-24', '2011-04-13'],
-        [13,  3, 'ARCHAI: AS ORIGENS DO PENSAMENTO OCIDENTAL', '2014-11-29', '2023-11-30'],
-        [14,  3, 'AVALIAÇÃO DE RISCO DA EXPOSIÇÃO HUMANA A RESIDUOS E CONTAMINANTES', '2011-11-28', '2020-12-13'],
-        [15,  7, 'Acesso Livre', '2013-06-30', '2024-10-20'],
-        [16,  2, 'Acesso a Medicamentos e Uso Responsável - AMUR', '2024-10-27', '2011-10-19'],
-        [17,  6, 'AcquaUnB', '2021-12-25', '2016-11-18'],
+        [13, 3, 'ARCHAI: AS ORIGENS DO PENSAMENTO OCIDENTAL', '2014-11-29', '2023-11-30'],
+        [14, 3, 'AVALIAÇÃO DE RISCO DA EXPOSIÇÃO HUMANA A RESIDUOS E CONTAMINANTES', '2011-11-28', '2020-12-13'],
+        [15, 7, 'Acesso Livre', '2013-06-30', '2024-10-20'],
+        [16, 2, 'Acesso a Medicamentos e Uso Responsável - AMUR', '2024-10-27', '2011-10-19'],
+        [17, 6, 'AcquaUnB', '2021-12-25', '2016-11-18'],
         [18, 3, 'Adaptações estruturais e funcionais de plantas em resposta a variações ambientais', '2023-06-24', '2022-01-07'],
         [19, 2, 'Administração Pública Comparada', '2014-05-15', '2014-08-31'],
         [20, 3, 'Administração da Justiça', '2021-04-12', '2011-09-25'],
         [21, 8, 'Alimentação e Microbiota intestinal', '2018-01-06', '2018-04-25'],
         [22, 8, 'Alimentação e qualidade de vida nas restrições alimentares', '2020-06-09', '2018-12-26'],
-        [23,7,  'Ambiente 33 - Espacialidades, Comunicação, Estética e Tecnologias', '2011-06-23', '2012-09-08'],
+        [23, 7,  'Ambiente 33 - Espacialidades, Comunicação, Estética e Tecnologias', '2011-06-23', '2012-09-08'],
         [24, 8,'Anarchai - Metafísica e política contemporâneas', '2015-11-20', '2017-05-27'],
         [25, 6,'Animalia: Grupo de Estudos sobre as Relações entre Humanos e Animais na Antiguidade', '2015-04-19', '2022-02-05'],
         [26, 4, 'Antropologia Política da Saúde', '2021-07-13', '2016-09-25'],
@@ -77,8 +77,8 @@ tables = {
         [33, 6, 'Aprendizagens,Tecnologias e Educação a Distância', '2020-08-20', '2010-01-11'],
         [34, 2, 'Arquitetura e Urbanismo da Região de Brasília', '2014-05-04', '2023-08-13'],
         [35, 8, 'Arte Computacional', '2014-02-07', '2022-01-13'],
-        [36,  3, 'Arte, Sociedade e Interpretações do Brasil', '2010-06-11', '2012-10-12'],
-        [37,  6, 'As Tecnologias da Informação e Comunicação nos Processos de Formação Musical', '2019-10-08', '2017-09-27'],
+        [36, 3, 'Arte, Sociedade e Interpretações do Brasil', '2010-06-11', '2012-10-12'],
+        [37, 6, 'As Tecnologias da Informação e Comunicação nos Processos de Formação Musical', '2019-10-08', '2017-09-27'],
         [38, 5, 'Aspectos microbiológicos e imunológicos da interação hospedeiro-fungo', '2021-01-02', '2015-09-20'],
         [39, 5, 'Avaliação computacional de dados, processos e moléculas de interesse na saúde humana', '2020-07-05', '2024-07-28'],
         [40, 8, 'Avaliação de tecnologias em doenças tropicais negligenciadas', '2018-05-10', '2014-10-13'],
@@ -103,11 +103,11 @@ tables = {
         [8, "Ciências Biológicas"]
     ],
     "patrimonio" : [
-        [1],
-        [2],
-        [3],
-        [4],
-        [5]
+        [1, "DEFAULT", "", 200, "..."],
+        [1, "DEFAULT", "", 200, "..."],
+        [3, "DEFAULT", "", 200, "..."],
+        [4, "DEFAULT", "", 200, "..."],
+        [5, "DEFAULT", "", 200, "..."]
     ],
     "possui" : [
         [],
@@ -166,11 +166,11 @@ tables = {
         []
     ],
     "congresso" : [
-        [1, "'CSBC'", "'...'"],
-        [2, "'Congresso Brasileiro de Cardiologia'", "'..'"],
-        [3, "'Congresso Brasileiro de Informática na Educaç'", "'...'"],
-        [4, "'Simpósio Brasileiro de Banco de Dados'", "'...'"],
-        [5, "'Simpósio Brasileiro de Educação em Computação'", "'...'"]
+        [1, "CSBC", "..."],
+        [2, "Congresso Brasileiro de Cardiologia", ".."],
+        [3, "Congresso Brasileiro de Informática na Educaç", "..."],
+        [4, "Simpósio Brasileiro de Banco de Dados", "..."],
+        [5, "Simpósio Brasileiro de Educação em Computação", "..."]
     ],
     "edicao" : [
         [1, 2025],
@@ -243,7 +243,7 @@ tables = {
         [],
         []
     ],
-    }
+}
 
 if __name__ == "__main__":
     password = getpass.getpass("Senha: ")
@@ -260,11 +260,32 @@ if __name__ == "__main__":
         print(f" - {table}")
     input("===================\n"
         "\nPressione Enter para continuar...")
-    for k, v in tables.items():
-        values = str(v)[1:-1] # remover [] da string
-        conexao.cursor().execute(f"""
-                                 INSERT INTO '{k}'
-                                 VALUES ({values})
-                                 """)
-        
-    print("Tabelas populadas com sucesso!")
+
+    try:
+        for k, v in tables.items():
+            for linha in v:
+                valores = ""
+                
+                for i in range(len(linha)):
+                    if type(linha[i]).__name__ == "str" and linha[i] != "DEFAULT":
+                        valores += f"'{linha[i]}'"
+                    else:
+                        valores += f"{linha[i]}"
+
+
+                    if i < len(linha) - 1:
+                        valores += ", "
+
+                print("insert", k, " -> ", valores)
+
+                conexao.cursor().execute(f"""
+                                        INSERT INTO {k}
+                                        VALUES ({valores})
+                                        """)
+            
+        print("Tabelas populadas com sucesso!")
+
+    except pyodbc.Error as e:
+        print(f"Erro ao popular tabelas!!\n{e}")
+    except Exception as exc:
+        print(f"Erro ao popular tabelas!!\n{exc}")

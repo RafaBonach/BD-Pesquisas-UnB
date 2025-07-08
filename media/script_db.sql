@@ -63,7 +63,7 @@ CREATE TABLE LINHA_PESQUISA (
 
 CREATE TABLE AREA_ATUACAO (
   Id_Area_Atuacao  INT          GENERATED ALWAYS AS IDENTITY, /*Modifiquei id para serial*/
-  Abrangencia      VARCHAR(12)  NOT NULL,
+  Abrangencia      VARCHAR(40)  NOT NULL,
   Nome             VARCHAR(45)  NOT NULL,
   Descrição        text,
 
