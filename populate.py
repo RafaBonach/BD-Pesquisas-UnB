@@ -117,39 +117,39 @@ tables = {
         [5, 13565905] # Projeto 4 na localidade 13565905 (UFSCAR)
     ],
     "financia" : [
-        [1, "00038174000143"], # Projeto 0 da UnB financiado pela instituição 00038174000143
-        [2, "63025530000104"], # Projeto 1 da UnB financiado pela instituição 00038174000143
-        [3, ], # Projeto 2 da UnB financiado pela instituição 00038174000143
-        [4, ], # Projeto 3 da UnB financiado pela instituição 00038174000143
-        [5, ] # Projeto 4 da UnB financiado pela instituição 00038174000143
+        [1, 38174000143], # Projeto 0 da UnB financiado pela instituição 00038174000143
+        [2, 63025530000104], # Projeto 1 da USP financiado pela instituição 00038174000143
+        [3, 17217985000104], # Projeto 2 da UFMG financiado pela instituição 00038174000143
+        [4, 1567601000143], # Projeto 3 da UFG financiado pela instituição 00038174000143
+        [5, 66991647000130] # Projeto 4 da UFSCAR financiado pela instituição 00038174000143
     ],
     "fomenta" : [
-        [],
-        [],
-        [],
-        [],
-        []
+        [38174000143, 1], # Projeto 0 fomentado pela UnB
+        [63025530000104,2], # Projeto 1 fomentado pela USP
+        [17217985000104,3], # Projeto 2 fomentado pela UFMG
+        [1567601000143,4], # Projeto 3 fomentado pela UFG
+        [66991647000130,5] # Projeto 4 fomentado pela UFSCAR 
     ],
     "participa" : [
-        [],
-        [],
-        [],
-        [],
-        []
+        [1, 0], # Congresso 1 (CSBC) com Projeto 0
+        [2, 1], # Congresso 2 com Projeto 1
+        [3, 2], # Congresso 3 com Projeto 2 
+        [4, 3], # Congresso 4 com Projeto 3
+        [5, 4] # Congresso 5 com Projeto 4
     ],
     "vincula" : [
-        [],
-        [],
-        [],
-        [],
-        []
+        [1, 0], # Área 0 (Ciências Humanas) vinculada ao Projeto 0
+        [2, 1], # Área 1 (Diplomacia) vinculada ao Projeto 1
+        [3, 2], # Área 2 (Decoração) vinculada ao Projeto 2
+        [4, 3], # Área 3 (Engenharia de Armamentos) ao Projeto 3
+        [5, 4] # Área 4 (Carreira Militar)
     ],
     "pesquisa" : [
-        [],
-        [],
-        [],
-        [],
-        []
+        [], # Pesquisador 0 pesquisa Projeto 0
+        [], # Pesquisador 0 pesquisa Projeto 0
+        [], # Pesquisador 0 pesquisa Projeto 0
+        [], # Pesquisador 0 pesquisa Projeto 0
+        [] # Pesquisador 0 pesquisa Projeto 0
     ],
     "realiza" : [
         [],
