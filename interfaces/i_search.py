@@ -23,11 +23,11 @@ def i_titulo(tipo_pesquisa):
                 "==========================\n\n"
                 "Preencha os dados a seguir para pesquisar um pesquisador\n"
                 "deixe em branco para pesquisar todos os pesquisadores\n")
+            id = input("ID do pesquisador: ").strip() or ""
             nome_pesquisador = input("Nome do pesquisador: ").strip() or ""
-            instituicao = input("Instituição: ").strip() or ""
             time.sleep(2)
 
-            return [nome_pesquisador, instituicao]
+            return [id, nome_pesquisador]
 
         case "inst":
             clear()

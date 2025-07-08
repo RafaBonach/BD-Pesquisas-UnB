@@ -33,13 +33,13 @@ class Pesquisa_projeto:
             return None
 
 class Pesquisa_membros:
-    def __init__(self, id=None, nome_membro=""):
+    def __init__(self, id="", nome_membro=""):
         self.id = id
         self.nome_membro = nome_membro
     
     def info_pesquisador(self, cursor):
         operacao = ""
-        if self.id is not None:
+        if self.id != "":
             operacao += f"id_membro = {self.id} AND "
         if self.nome_membro != "":
             operacao += f"nome LIKE '%{self.nome_membro}%' AND "
