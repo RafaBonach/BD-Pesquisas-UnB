@@ -163,7 +163,6 @@ def create_view_sql_script(password, db_name='db_pesquisas', sql_script_path='me
             SELECT table_name 
             FROM information_schema.views 
             WHERE table_schema = 'public'
-            AND table_type = 'VIEW'
         """)
 
         existing_views = [row[0].upper() for row in cursor.fetchall()]

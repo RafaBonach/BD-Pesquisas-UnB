@@ -176,5 +176,3 @@ GROUP BY
   i.Localidade,
   i.Recursos_Investidos,
   i.Descrição;
-
-  select * from vw_detalhes_instituicoes_agrupada
