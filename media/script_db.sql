@@ -15,7 +15,7 @@ CREATE TABLE MEMBRO (
 /* Projeto tem um tipo */
 CREATE TABLE TIPO_PROJETO (
   Id_Tipo_Proj  INT          GENERATED ALWAYS AS IDENTITY, /*Modifiquei id para serial*/
-  Nome_Tipo     VARCHAR(20)  NOT NULL,
+  Nome_Tipo     VARCHAR(40)  NOT NULL,
 
   PRIMARY KEY  (Id_Tipo_Proj) /*Modifiquei a chave primaria*/
 );
@@ -23,7 +23,7 @@ CREATE TABLE TIPO_PROJETO (
 CREATE TABLE PROJETO (
   Cod_Proj        INT          GENERATED ALWAYS AS IDENTITY,  /*Modifiquei id para serial*/
   Id_Tipo_Proj    INT,
-  Título          VARCHAR(75)  NOT NULL,
+  Título          VARCHAR(200)  NOT NULL,
   Data_final      DATE         NOT NULL,
   Data_inicio     DATE         NOT NULL,
   Resumo          text,
@@ -35,7 +35,7 @@ CREATE TABLE PROJETO (
 );
 
 CREATE TABLE INSTITUICAO (
-  CNPJ                 INT          PRIMARY KEY,
+  CNPJ                 bigint       PRIMARY KEY,
   Nome                 VARCHAR(50)  NOT NULL,
   Sigla                VARCHAR(10),
   Natureza_Juríd       VARCHAR(60),
@@ -55,7 +55,7 @@ CREATE TABLE CONGRESSO (
 
 CREATE TABLE LINHA_PESQUISA (
   Id_Linha_Pesquisa  INT          GENERATED ALWAYS AS IDENTITY, /*Modifiquei id para serial*/
-  Nome               VARCHAR(45)  NOT NULL,
+  Nome               VARCHAR(120)  NOT NULL,
   Descrição          text,
 
   PRIMARY KEY  (Id_Linha_Pesquisa) /* Transformei id em PK */
@@ -184,7 +184,7 @@ CREATE TABLE Participa (
 
 /* Instituição tem múltiplos CNAE */
 CREATE TABLE CNAE (
-  CNPJ_Instituicao  INT,
+  CNPJ_Instituicao  bigint,
   CNAE              VARCHAR(20),
   
   PRIMARY KEY  (CNPJ_Instituicao, CNAE),
@@ -194,7 +194,7 @@ CREATE TABLE CNAE (
 /* Instituição financia Projeto */
 CREATE TABLE Financia (
   Cod_Proj  INT,
-  CNPJ      INT,
+  CNPJ      bigint,
 
   PRIMARY KEY  (Cod_Proj, CNPJ),
   FOREIGN KEY  (Cod_Proj)  REFERENCES PROJETO(Cod_Proj) ON DELETE CASCADE,
@@ -203,7 +203,7 @@ CREATE TABLE Financia (
 
 /* Instituição fomenta Projeto */
 CREATE TABLE Fomenta (
-  CNPJ      INT,
+  CNPJ      bigint,
   Cod_Proj  INT,
   Tipo      VARCHAR(20)  NOT NULL,
 
