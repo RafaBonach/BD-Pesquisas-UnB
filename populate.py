@@ -117,11 +117,11 @@ tables = {
         [5, 13565905] # Projeto 4 na localidade 13565905 (UFSCAR)
     ],
     "financia" : [
-        [],
-        [],
-        [],
-        [],
-        []
+        [1, "00038174000143"], # Projeto 0 da UnB financiado pela instituição 00038174000143
+        [2, "63025530000104"], # Projeto 1 da UnB financiado pela instituição 00038174000143
+        [3, ], # Projeto 2 da UnB financiado pela instituição 00038174000143
+        [4, ], # Projeto 3 da UnB financiado pela instituição 00038174000143
+        [5, ] # Projeto 4 da UnB financiado pela instituição 00038174000143
     ],
     "fomenta" : [
         [],
