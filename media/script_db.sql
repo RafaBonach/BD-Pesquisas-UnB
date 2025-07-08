@@ -36,11 +36,11 @@ CREATE TABLE PROJETO (
 
 CREATE TABLE INSTITUICAO (
   CNPJ                 INT          PRIMARY KEY,
-  Nome                 VARCHAR(40)  NOT NULL,
+  Nome                 VARCHAR(50)  NOT NULL,
   Sigla                VARCHAR(10),
-  Natureza_Juríd       VARCHAR(20),
+  Natureza_Juríd       VARCHAR(60),
   UF                   CHAR(2)      NOT NULL,
-  Localidade           VARCHAR(30)  NOT NULL,
+  Localidade           VARCHAR(50)  NOT NULL,
   Recursos_Investidos  INT,
   Descrição            text
 );
