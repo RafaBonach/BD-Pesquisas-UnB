@@ -140,6 +140,7 @@ class ISearch:
             id=self.info[0],
             projeto=self.info[1],
         )
+        print(projeto)
         
         resultado = projeto.resultado_pesquisa(self.cursor)
 
@@ -156,13 +157,15 @@ class ISearch:
         return resultado
     
     def search_instituicao(self):
+        print(self.info)
         instituicao = Pesquisa_instituicao(
-            id=self.info[0],
-            nome_instituicao=self.info[1],
+            nome_instituicao=self.info[0],
+            sigla=self.info[1],
+            cnpj=self.info[2],
         )
-        
-        resultado = instituicao.info_instituicao(self.cursor)
 
+        resultado = instituicao.info_instituicao(self.cursor)
+        
         return resultado
 
 

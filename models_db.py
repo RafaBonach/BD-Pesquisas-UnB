@@ -58,9 +58,9 @@ class Pesquisa_membros:
             return None
 
 class Pesquisa_instituicao:
-    def __init__(self, id="", nome_instituicao="", cnpj="", sigla=""):
-        self.nome_instituicao = nome_instituicao
+    def __init__(self, cnpj="", nome_instituicao="", sigla=""):
         self.cnpj = cnpj
+        self.nome_instituicao = nome_instituicao
         self.sigla = sigla
     
     
@@ -74,7 +74,6 @@ class Pesquisa_instituicao:
         
         if self.sigla != "":
             operacao += f"Sigla LIKE '%{self.sigla}%' AND "
-        
 
         if operacao != "":
             operacao = operacao[:-5]
