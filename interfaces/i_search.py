@@ -12,8 +12,9 @@ def i_titulo(tipo_pesquisa):
                 "Preencha os dados a seguir para pesquisar um projeto\n"
                 "deixe em branco para pesquisar todos os projetos\n")
             nome_projeto = input("Nome do projeto: ").strip() or ""
+            id = input("ID do projeto: ").strip() or ""
             time.sleep(2)
-            return [nome_projeto]
+            return [nome_projeto, id]
         
         case "pesq":
             clear()
@@ -70,7 +71,7 @@ def i_resultado(tipo_pesquisa, resultado):
                         print(f"Linhas de pesquisa:         {p[14] if p[14] else "N/A"}")
                         print("\n\n==========================\n")
                         time.sleep(1)
-                    print("\n\nTotal de projetos encontrados: ", len(resultado[0]))
+                    print("\n\nTotal de projetos encontrados: ", len(resultado))
                 else:
                     print("Nenhum projeto encontrado com os critérios informados.")
             
@@ -137,10 +138,9 @@ class ISearch:
 
     def search_projects(self):
         projeto = Pesquisa_projeto(
-            id=self.info[0],
-            projeto=self.info[1],
+            projeto=self.info[0],
+            id=self.info[1],
         )
-        print(projeto)
         
         resultado = projeto.resultado_pesquisa(self.cursor)
 
