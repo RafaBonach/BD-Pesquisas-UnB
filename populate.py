@@ -37,7 +37,7 @@ tables = {
         [70910900, "Brasil", "DF", "Brasília"], # UnB - Darcy
         [5508220, "Brasil", "SP", "São Paulo"], # USP
         [31270901, "Brasil", "MG", "Belo Horizonte"], # UFMG
-        [74690900, "Brasil", "GO", "Goiânia"], # UFGO
+        [74690900, "Brasil", "GO", "Goiânia"], # UFG
         [13565905, "Brasil", "SP", "São Carlos"] #UFSCAR
     ],
     "projeto" : [
@@ -202,11 +202,11 @@ tables = {
 
     ],
     "membro" : [
-        [1],
-        [2],
-        [3],
-        [4],
-        [5]
+        ["DEFAULT", , , , , , ,],
+        ["DEFAULT", , , , , , ,],
+        ["DEFAULT", , , , , , ,],
+        ["DEFAULT", , , , , , ,],
+        ["DEFAULT", , , , , , ,]
     ],
     "email" : [
         [1, "pudim@gov.br"],
@@ -230,18 +230,18 @@ tables = {
         []
     ],
     "instituicao" : [
-        ["00038174000143"], # UnB - Darcy
-        ["63025530000104"], # USP
-        [],
-        [],
-        []
+        [38174000143, "Universidade de Brasília"], # UnB - Darcy
+        [63025530000104, "Universidade de São Paulo", "USP", ""], # USP
+        [17217985000104, ], # UFMG
+        [1567601000143,], # UFG
+        [66991647000130, ] # UFSCAR
     ],
     "cnae" : [
-        [85317], # UnB - Darcy
-        [85325], # USP
-        [],
-        [],
-        []
+        [38174000143, 85317], # UnB - Darcy
+        [63025530000104, 85325], # USP
+        [17217985000104, 8411600], # UFMG
+        [1567601000143, 8531700], # UFG
+        [66991647000130, 85503] # UFSCAR
     ],
 }
 
