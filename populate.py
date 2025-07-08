@@ -110,11 +110,11 @@ tables = {
         [5, "DEFAULT", "", 200, "..."]
     ],
     "possui" : [
-        [],
-        [],
-        [],
-        [],
-        []
+        [1, 70910900], # Projeto 0 na localidade 70910900 (UnB - Darcy)
+        [2, 5508220], # Projeto 1 na localidade 5508220 (USP)
+        [3, 31270901], # Projeto 2 na localidade 31270901 (UFMG)
+        [4, 74690900], # Projeto 3 na localidade 74690900 (UFGO)
+        [5, 13565905] # Projeto 4 na localidade 13565905 (UFSCAR)
     ],
     "financia" : [
         [],
