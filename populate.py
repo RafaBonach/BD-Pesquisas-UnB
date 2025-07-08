@@ -131,39 +131,39 @@ tables = {
         [66991647000130,5] # Projeto 4 fomentado pela UFSCAR 
     ],
     "participa" : [
-        [1, 0], # Congresso 1 (CSBC) com Projeto 0
-        [2, 1], # Congresso 2 com Projeto 1
-        [3, 2], # Congresso 3 com Projeto 2 
-        [4, 3], # Congresso 4 com Projeto 3
-        [5, 4] # Congresso 5 com Projeto 4
+        [1, 1], # Congresso 1 (CSBC) com Projeto 0
+        [2, 2], # Congresso 2 com Projeto 1
+        [3, 3], # Congresso 3 com Projeto 2 
+        [4, 4], # Congresso 4 com Projeto 3
+        [5, 5] # Congresso 5 com Projeto 4
     ],
     "vincula" : [
-        [1, 0], # Área 0 (Ciências Humanas) vinculada ao Projeto 0
-        [2, 1], # Área 1 (Diplomacia) vinculada ao Projeto 1
-        [3, 2], # Área 2 (Decoração) vinculada ao Projeto 2
-        [4, 3], # Área 3 (Engenharia de Armamentos) ao Projeto 3
-        [5, 4] # Área 4 (Carreira Militar)
+        [1, 1], # Área 0 (Ciências Humanas) vinculada ao Projeto 0
+        [2, 2], # Área 1 (Diplomacia) vinculada ao Projeto 1
+        [3, 3], # Área 2 (Decoração) vinculada ao Projeto 2
+        [4, 4], # Área 3 (Engenharia de Armamentos) ao Projeto 3
+        [5, 5] # Área 4 (Carreira Militar) ao Projeto 4
     ],
     "pesquisa" : [
-        [], # Pesquisador 0 pesquisa Projeto 0
-        [], # Pesquisador 0 pesquisa Projeto 0
-        [], # Pesquisador 0 pesquisa Projeto 0
-        [], # Pesquisador 0 pesquisa Projeto 0
-        [] # Pesquisador 0 pesquisa Projeto 0
+        [1, 1], # Pesquisador 1 pesquisa Projeto 0
+        [1, 2], # Pesquisador 1 pesquisa Projeto 1
+        [1, 3], # Pesquisador 1 pesquisa Projeto 2
+        [2, 4], # Pesquisador 2 pesquisa Projeto 3
+        [2, 5] # Pesquisador 2 pesquisa Projeto 4
     ],
     "realiza" : [
-        [],
-        [],
-        [],
-        [],
-        []
+        [3, 1], # Estudante 3 realiza Projeto 0
+        [3, 2], # Estudante 3 realiza Projeto 1
+        [3, 3], # Estudante 3 realiza Projeto 2
+        [4, 4], # Estudante 4 realiza Projeto 3
+        [4, 5] # Estudante 4 realiza Projeto 4
     ],
     "executa" : [
-        [],
-        [],
-        [],
-        [],
-        []
+        [1, 1], # Linha de Pesquisa 0 executa Projeto 0
+        [2, 2], # Linha de Pesquisa 1 executa Projeto 1
+        [3, 3], # Linha de Pesquisa 2 executa Projeto 2
+        [4, 4], # Linha de Pesquisa 3 executa Projeto 3
+        [5, 5] # Linha de Pesquisa 4 executa Projeto 4
     ],
     "congresso" : [
         [1, "CSBC", "..."],
