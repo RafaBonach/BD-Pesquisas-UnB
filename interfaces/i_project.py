@@ -298,11 +298,11 @@ class IProject:
                             cod_postal = input("Digite o código postal da localidade do projeto, N para não inserir localidade no projeto\nou selecione qualquer tecla para criar uma nova localidade: ")
                             if l_localidades != {} and int(cod_postal) in l_localidades:
                                 localidade.cod_postal = int(cod_postal)
-                                
+                                projeto.localidade = localidade
                                 self.connect_projeto_localidade(projeto)
                             elif cod_postal.strip().upper() == 'N':
                                 print("\nLocalidade não inserida no projeto.\n")
-                                localidade.cod_postal = None
+                                localidadse.cod_postal = None
                             else:
                                 clear()
                                 print("==========================\n"
@@ -328,8 +328,8 @@ class IProject:
                                     print("\n\nDados da localidade inválidos. Localidade não criada.")
                                     projeto.localidade = None
 
-                                if input("\n\nDeseja inserir outra localidade no projeto?(S/N): ").strip().upper() != 'S':
-                                    break
+                            if input("\n\nDeseja inserir outra localidade no projeto?(S/N): ").strip().upper() != 'S':
+                                break
                                       
                     
                     validador = ''
@@ -868,7 +868,7 @@ class IProject:
               "    de Pesquisa da UnB    \n"
               "==========================\n\n")
         print("Selecione uma opção:")
-        options = ["Voltar", "Criar projeto", "Inserir dados extras em projeto" "Listar projetos", "Atualizar projeto", "Deletar projeto", "Inserir Relatorio", "Coletar Relatório"]
+        options = ["Voltar", "Criar projeto", "Inserir dados extras em projeto", "Listar projetos", "Atualizar projeto", "Deletar projeto", "Inserir Relatorio", "Coletar Relatório"]
         print_menu(options)
         choice = input_choice(len(options))
 

@@ -70,7 +70,6 @@ def i_resultado(tipo_pesquisa, resultado):
                         print(f"Localização do projeto:     {p[13] if p[13] else "N/A"}")
                         print(f"Linhas de pesquisa:         {p[14] if p[14] else "N/A"}")
                         print("\n\n==========================\n")
-                        time.sleep(1)
                     print("\n\nTotal de projetos encontrados: ", len(resultado))
                 else:
                     print("Nenhum projeto encontrado com os critérios informados.")
@@ -95,7 +94,6 @@ def i_resultado(tipo_pesquisa, resultado):
                         print(f"Projetos que participa: {p[11] if p[11] else "N/A"}")
                         print("\n\n==========================\n")
                     print("\n\nTotal de pesquisadores encontrados: ", len(l_resultados))
-                    time.sleep(1)
                 else:
                     print("Nenhum membro encontrado com os critérios informados.")
 
@@ -117,9 +115,9 @@ def i_resultado(tipo_pesquisa, resultado):
                         print(f"Projetos Financiados:   {p[10] if p[10] else "N/A"}")
                         print("\n\n==========================\n")
                     print("\n\nTotal de pesquisadores encontrados: ", len(l_resultados))
-                    time.sleep(1)
                 else:
                     print("Nenhuma instituição encontrada com os critérios informados.")
+        time.sleep(1)
     else:
         print("==============================\n"
               "Nenhuma informação encontrado."

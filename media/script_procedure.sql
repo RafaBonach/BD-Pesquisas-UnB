@@ -180,7 +180,7 @@ $$;
 /* INSTITUIÇÃO */
 /* FOMENTA */
 CREATE OR REPLACE PROCEDURE instituicao_fomenta_projeto(
-    p_cnpj INT,
+    p_cnpj bigint,
     p_cod_proj INT,
     p_tipo VARCHAR(20)
 )
@@ -194,7 +194,7 @@ $$;
 
 /* FINANCIA */
 CREATE OR REPLACE PROCEDURE instituicao_financia_projeto(
-    p_cnpj INT,
+    p_cnpj bigint,
     p_cod_proj INT
 )
 LANGUAGE plpgsql
