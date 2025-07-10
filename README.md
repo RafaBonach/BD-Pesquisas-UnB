@@ -24,9 +24,13 @@ funções.
 # Manual de uso
 
 ### Requisitos:
-Requisitos disponiveis em: [requirements.txt](requirements.txt)
+Baixe o postgresql em https://www.postgresql.org/download/ e realize a configuração inicial.
+
+Baixe o drive **_ODBC Driver for PostgreSQL_** em https://www.devart.com/odbc/postgresql/
 
 Para instalar os pacotes Python:
+- Requisitos python disponiveis em: [requirements.txt](requirements.txt)
+
 - Certifique-se de que está no ambiente virtual
     ```sh
     python -m venv venv
@@ -48,3 +52,7 @@ python main.py
 O sistema permite que você crie uma conta de um dos tipos disponíveis
 (Instituição, Pesquisador, Estudante, Colaborador Externo), crie um projeto
 e pesquise projetos no banco de dados.
+
+**ATENÇÃO!** Antes de realizar qualquer manipulação, será gerada uma tela no terminial que irá solicitar a senha do  usuário 'postgres' no PostgreSQL. Insira a senha corretamente para iniciar o programa.
+
+Caso o usuário padrão do Postgre não seja 'postgres', modifique o valor de user_id presente na assinatura de cada função no arquivo [backend_db.py](backend_db.py).
