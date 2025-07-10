@@ -302,7 +302,7 @@ class IProject:
                                 self.connect_projeto_localidade(projeto)
                             elif cod_postal.strip().upper() == 'N':
                                 print("\nLocalidade não inserida no projeto.\n")
-                                localidadse.cod_postal = None
+                                localidade.cod_postal = None
                             else:
                                 clear()
                                 print("==========================\n"
